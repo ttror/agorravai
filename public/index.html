@@ -1,0 +1,770 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dr. Alexandre Santos - Consultório Psiquiátrico</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .consultorio-container {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            max-width: 1000px;
+            width: 100%;
+            height: 85vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            border: 1px solid #e2e8f0;
+        }
+
+        .header-medico {
+            background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+            color: white;
+            padding: 25px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .foto-medico {
+            width: 80px;
+            height: 80px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            border: 3px solid rgba(255,255,255,0.3);
+        }
+
+        .info-medico h1 {
+            font-size: 1.8em;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+
+        .info-medico .especialidade {
+            font-size: 1em;
+            opacity: 0.9;
+            margin-bottom: 3px;
+        }
+
+        .info-medico .crm {
+            font-size: 0.85em;
+            opacity: 0.8;
+        }
+
+        .status-consulta {
+            margin-left: auto;
+            text-align: right;
+        }
+
+        .fase-atual {
+            background: rgba(255,255,255,0.2);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            margin-bottom: 5px;
+        }
+
+        .tempo-consulta {
+            font-size: 0.8em;
+            opacity: 0.8;
+        }
+
+        .disclaimer-medico {
+            background: #fef3c7;
+            border-left: 4px solid #f59e0b;
+            padding: 15px 25px;
+            font-size: 0.85em;
+            color: #92400e;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .area-consulta {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .conversa-medica {
+            flex: 1;
+            overflow-y: auto;
+            padding: 25px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .mensagem-medica {
+            display: flex;
+            gap: 15px;
+            max-width: 85%;
+            animation: aparecer 0.4s ease-out;
+        }
+
+        .mensagem-medica.paciente {
+            align-self: flex-end;
+            flex-direction: row-reverse;
+        }
+
+        .avatar-consulta {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+
+        .mensagem-medica.medico .avatar-consulta {
+            background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+            color: white;
+        }
+
+        .mensagem-medica.paciente .avatar-consulta {
+            background: linear-gradient(135deg, #059669 0%, #10b981 100%);
+            color: white;
+        }
+
+        .conteudo-mensagem {
+            background: #f8fafc;
+            padding: 18px 22px;
+            border-radius: 18px;
+            line-height: 1.6;
+            position: relative;
+        }
+
+        .mensagem-medica.medico .conteudo-mensagem {
+            background: #f0f9ff;
+            border: 1px solid #e0f2fe;
+        }
+
+        .mensagem-medica.paciente .conteudo-mensagem {
+            background: #f0fdf4;
+            border: 1px solid #dcfce7;
+        }
+
+        .info-mensagem {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 8px;
+            font-size: 0.75em;
+            color: #64748b;
+        }
+
+        @keyframes aparecer {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .area-input {
+            padding: 25px;
+            border-top: 1px solid #e2e8f0;
+            background: #f8fafc;
+        }
+
+        .formulario-inicial {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .grupo-campo {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .grupo-campo label {
+            font-weight: 600;
+            color: #374151;
+            font-size: 0.9em;
+        }
+
+        .grupo-campo input, .grupo-campo select, .grupo-campo textarea {
+            padding: 12px 16px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.2s;
+        }
+
+        .grupo-campo input:focus, .grupo-campo select:focus, .grupo-campo textarea:focus {
+            outline: none;
+            border-color: #3b82f6;
+        }
+
+        .campos-linha {
+            display: flex;
+            gap: 15px;
+        }
+
+        .campos-linha .grupo-campo {
+            flex: 1;
+        }
+
+        .interface-consulta {
+            display: none;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .indicador-digitacao {
+            display: none;
+            align-items: center;
+            gap: 10px;
+            color: #64748b;
+            font-style: italic;
+            padding: 15px 0;
+        }
+
+        .pontos-digitacao {
+            display: flex;
+            gap: 4px;
+        }
+
+        .ponto-digitacao {
+            width: 6px;
+            height: 6px;
+            background: #64748b;
+            border-radius: 50%;
+            animation: pulsarDigitacao 1.4s infinite;
+        }
+
+        .ponto-digitacao:nth-child(2) { animation-delay: 0.2s; }
+        .ponto-digitacao:nth-child(3) { animation-delay: 0.4s; }
+
+        @keyframes pulsarDigitacao {
+            0%, 60%, 100% { transform: translateY(0); }
+            30% { transform: translateY(-8px); }
+        }
+
+        .linha-input {
+            display: flex;
+            gap: 15px;
+            align-items: flex-end;
+        }
+
+        .input-mensagem {
+            flex: 1;
+            padding: 15px 20px;
+            border: 2px solid #e5e7eb;
+            border-radius: 25px;
+            font-size: 16px;
+            resize: none;
+            min-height: 50px;
+            max-height: 120px;
+            transition: border-color 0.2s;
+        }
+
+        .input-mensagem:focus {
+            outline: none;
+            border-color: #3b82f6;
+        }
+
+        .botao-enviar {
+            background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+            color: white;
+            border: none;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            transition: transform 0.2s;
+        }
+
+        .botao-enviar:hover:not(:disabled) {
+            transform: scale(1.05);
+        }
+
+        .botao-enviar:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .botao-iniciar, .botao-finalizar {
+            background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .botao-finalizar {
+            background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%);
+            align-self: flex-start;
+        }
+
+        .botao-iniciar:hover, .botao-finalizar:hover {
+            transform: translateY(-2px);
+        }
+
+        .erro-consulta {
+            background: #fee2e2;
+            border: 1px solid #fecaca;
+            color: #dc2626;
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            font-size: 0.9em;
+        }
+
+        .overlay-carregamento {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .conteudo-carregamento {
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            text-align: center;
+            max-width: 300px;
+        }
+
+        .spinner-medico {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #3b82f6;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: girar 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes girar {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .info-fase {
+            background: #eff6ff;
+            border: 1px solid #dbeafe;
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            font-size: 0.85em;
+            color: #1e40af;
+        }
+
+        @media (max-width: 768px) {
+            .consultorio-container {
+                height: 95vh;
+                margin: 10px;
+            }
+            
+            .mensagem-medica {
+                max-width: 95%;
+            }
+            
+            .header-medico {
+                flex-direction: column;
+                text-align: center;
+                gap: 15px;
+            }
+
+            .status-consulta {
+                margin-left: 0;
+            }
+
+            .campos-linha {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="overlay-carregamento" id="overlay-carregamento">
+        <div class="conteudo-carregamento">
+            <div class="spinner-medico"></div>
+            <p>Conectando com Dr. Alexandre...</p>
+        </div>
+    </div>
+
+    <div class="consultorio-container">
+        <div class="header-medico">
+            <div class="foto-medico">👨‍⚕️</div>
+            <div class="info-medico">
+                <h1>Dr. Alexandre Santos</h1>
+                <div class="especialidade">Médico Psiquiatra</div>
+                <div class="crm">CRM-SP 123456 • Especialização em Psicofarmacologia</div>
+            </div>
+            <div class="status-consulta">
+                <div class="fase-atual" id="fase-atual">Aguardando Paciente</div>
+                <div class="tempo-consulta" id="tempo-consulta">--:--</div>
+            </div>
+        </div>
+
+        <div class="disclaimer-medico">
+            <span>⚠️</span>
+            <div>
+                <strong>Consulta Médica Virtual:</strong> Este é um atendimento psiquiátrico baseado em protocolos médicos reais. 
+                Em emergências, procure imediatamente o pronto-socorro ou ligue 192.
+            </div>
+        </div>
+
+        <div class="area-consulta">
+            <div class="conversa-medica" id="conversa-medica">
+                <!-- Mensagens da consulta aparecerão aqui -->
+            </div>
+
+            <div class="area-input">
+                <!-- Formulário inicial -->
+                <div class="formulario-inicial" id="formulario-inicial">
+                    <div class="info-fase">
+                        <strong>📋 Ficha de Identificação do Paciente</strong><br>
+                        Por favor, preencha seus dados para iniciarmos a consulta.
+                    </div>
+
+                    <div class="campos-linha">
+                        <div class="grupo-campo">
+                            <label for="nome">Nome Completo *</label>
+                            <input type="text" id="nome" placeholder="Digite seu nome completo" required>
+                        </div>
+                        <div class="grupo-campo">
+                            <label for="idade">Idade *</label>
+                            <input type="number" id="idade" placeholder="Idade" min="1" max="120" required>
+                        </div>
+                    </div>
+
+                    <div class="campos-linha">
+                        <div class="grupo-campo">
+                            <label for="genero">Gênero</label>
+                            <select id="genero">
+                                <option value="">Selecione</option>
+                                <option value="masculino">Masculino</option>
+                                <option value="feminino">Feminino</option>
+                                <option value="nao-binario">Não-binário</option>
+                                <option value="prefiro-nao-informar">Prefiro não informar</option>
+                            </select>
+                        </div>
+                        <div class="grupo-campo">
+                            <label for="historico-psiquiatrico">Histórico Psiquiátrico</label>
+                            <select id="historico-psiquiatrico">
+                                <option value="negativo">Nunca fiz tratamento psiquiátrico</option>
+                                <option value="positivo">Já fiz tratamento psiquiátrico</option>
+                                <option value="em-tratamento">Estou em tratamento atualmente</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="grupo-campo">
+                        <label for="motivo-consulta">Motivo Principal da Consulta</label>
+                        <textarea id="motivo-consulta" placeholder="Descreva brevemente o que o trouxe aqui hoje..." rows="3"></textarea>
+                    </div>
+
+                    <div class="grupo-campo">
+                        <label for="medicamentos-atuais">Medicamentos em Uso</label>
+                        <textarea id="medicamentos-atuais" placeholder="Liste os medicamentos que você usa atualmente (se houver)" rows="2"></textarea>
+                    </div>
+
+                    <button class="botao-iniciar" onclick="iniciarConsulta()">Iniciar Consulta Médica</button>
+                </div>
+
+                <!-- Interface de consulta -->
+                <div class="interface-consulta" id="interface-consulta">
+                    <div id="container-erro"></div>
+                    
+                    <div class="indicador-digitacao" id="indicador-digitacao">
+                        <span>Dr. Alexandre está analisando</span>
+                        <div class="pontos-digitacao">
+                            <div class="ponto-digitacao"></div>
+                            <div class="ponto-digitacao"></div>
+                            <div class="ponto-digitacao"></div>
+                        </div>
+                    </div>
+
+                    <div class="linha-input">
+                        <textarea 
+                            class="input-mensagem" 
+                            id="input-mensagem" 
+                            placeholder="Descreva seus sintomas ou responda às perguntas do Dr. Alexandre..."
+                            onkeypress="tratarTecla(event)"
+                            oninput="ajustarTamanho(this)"
+                        ></textarea>
+                        <button class="botao-enviar" id="botao-enviar" onclick="enviarMensagem()">
+                            ➤
+                        </button>
+                    </div>
+
+                    <button class="botao-finalizar" onclick="finalizarConsulta()">Finalizar Consulta</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let sessaoId = null;
+        let estaDigitando = false;
+        let inicioConsulta = null;
+
+        async function iniciarConsulta() {
+            const nome = document.getElementById('nome').value.trim();
+            const idade = document.getElementById('idade').value;
+            const genero = document.getElementById('genero').value;
+            const motivoConsulta = document.getElementById('motivo-consulta').value.trim();
+            const historicoPsiquiatrico = document.getElementById('historico-psiquiatrico').value;
+            const medicamentosAtuais = document.getElementById('medicamentos-atuais').value.trim();
+
+            if (!nome || !idade) {
+                alert('Por favor, preencha pelo menos o nome e a idade.');
+                return;
+            }
+
+            try {
+                mostrarCarregamento(true);
+                
+                const response = await fetch('/api/consulta/iniciar', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        nome, 
+                        idade, 
+                        genero, 
+                        motivoConsulta, 
+                        historicoPsiquiatrico, 
+                        medicamentosAtuais 
+                    })
+                });
+
+                const data = await response.json();
+                
+                if (response.ok) {
+                    sessaoId = data.sessaoId;
+                    inicioConsulta = new Date();
+                    
+                    // Esconder formulário e mostrar interface de consulta
+                    document.getElementById('formulario-inicial').style.display = 'none';
+                    document.getElementById('interface-consulta').style.display = 'flex';
+                    
+                    // Atualizar status
+                    document.getElementById('fase-atual').textContent = 'Em Consulta - ' + data.fase;
+                    iniciarCronometro();
+                    
+                    // Adicionar primeira mensagem do médico
+                    adicionarMensagem('medico', data.mensagem, 'Dr. Alexandre Santos');
+                    
+                } else {
+                    mostrarErro(data.error);
+                }
+            } catch (error) {
+                mostrarErro('Erro de conexão. Verifique sua internet e tente novamente.');
+            } finally {
+                mostrarCarregamento(false);
+            }
+        }
+
+        async function enviarMensagem() {
+            const inputMensagem = document.getElementById('input-mensagem');
+            const mensagem = inputMensagem.value.trim();
+            
+            if (!mensagem || estaDigitando) return;
+
+            // Limpar input e adicionar mensagem do paciente
+            inputMensagem.value = '';
+            ajustarTamanho(inputMensagem);
+            adicionarMensagem('paciente', mensagem, 'Você');
+            limparErros();
+
+            try {
+                mostrarDigitacao(true);
+                
+                const response = await fetch('/api/consulta/mensagem', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ sessaoId, mensagem })
+                });
+
+                const data = await response.json();
+                
+                if (response.ok) {
+                    // Simular tempo de análise médica
+                    await new Promise(resolve => setTimeout(resolve, 2000 + Math.random() * 3000));
+                    
+                    mostrarDigitacao(false);
+                    adicionarMensagem('medico', data.mensagem, data.medico);
+                    
+                    // Atualizar fase se mudou
+                    document.getElementById('fase-atual').textContent = 'Em Consulta - ' + data.fase;
+                    
+                } else {
+                    mostrarDigitacao(false);
+                    mostrarErro(data.error);
+                }
+            } catch (error) {
+                mostrarDigitacao(false);
+                mostrarErro('Erro de comunicação. Tente novamente.');
+            }
+        }
+
+        function adicionarMensagem(tipo, texto, nome) {
+            const containerConversa = document.getElementById('conversa-medica');
+            const divMensagem = document.createElement('div');
+            divMensagem.className = `mensagem-medica ${tipo}`;
+            
+            const avatar = tipo === 'medico' ? '👨‍⚕️' : '👤';
+            const horario = new Date().toLocaleTimeString('pt-BR', { 
+                hour: '2-digit', 
+                minute: '2-digit' 
+            });
+            
+            divMensagem.innerHTML = `
+                <div class="avatar-consulta">${avatar}</div>
+                <div class="conteudo-mensagem">
+                    <div>${texto}</div>
+                    <div class="info-mensagem">
+                        <span><strong>${nome}</strong></span>
+                        <span>${horario}</span>
+                    </div>
+                </div>
+            `;
+            
+            containerConversa.appendChild(divMensagem);
+            containerConversa.scrollTop = containerConversa.scrollHeight;
+        }
+
+        function mostrarDigitacao(mostrar) {
+            estaDigitando = mostrar;
+            const indicador = document.getElementById('indicador-digitacao');
+            const botaoEnviar = document.getElementById('botao-enviar');
+            
+            indicador.style.display = mostrar ? 'flex' : 'none';
+            botaoEnviar.disabled = mostrar;
+            
+            if (mostrar) {
+                const containerConversa = document.getElementById('conversa-medica');
+                containerConversa.scrollTop = containerConversa.scrollHeight;
+            }
+        }
+
+        function mostrarCarregamento(mostrar) {
+            document.getElementById('overlay-carregamento').style.display = mostrar ? 'flex' : 'none';
+        }
+
+        function mostrarErro(mensagem) {
+            const containerErro = document.getElementById('container-erro');
+            containerErro.innerHTML = `<div class="erro-consulta">${mensagem}</div>`;
+        }
+
+        function limparErros() {
+            document.getElementById('container-erro').innerHTML = '';
+        }
+
+        async function finalizarConsulta() {
+            if (!confirm('Deseja realmente finalizar a consulta com Dr. Alexandre?')) return;
+
+            try {
+                mostrarDigitacao(true);
+                
+                const response = await fetch('/api/consulta/finalizar', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ sessaoId })
+                });
+
+                const data = await response.json();
+                
+                if (response.ok) {
+                    mostrarDigitacao(false);
+                    adicionarMensagem('medico', data.mensagem, 'Dr. Alexandre Santos');
+                    
+                    // Desabilitar interface
+                    document.getElementById('input-mensagem').disabled = true;
+                    document.getElementById('botao-enviar').disabled = true;
+                    document.getElementById('fase-atual').textContent = 'Consulta Finalizada';
+                    
+                    // Opção de nova consulta
+                    setTimeout(() => {
+                        if (confirm('Consulta finalizada. Deseja agendar uma nova consulta?')) {
+                            location.reload();
+                        }
+                    }, 3000);
+                }
+            } catch (error) {
+                mostrarDigitacao(false);
+                mostrarErro('Erro ao finalizar consulta.');
+            }
+        }
+
+        function tratarTecla(event) {
+            if (event.key === 'Enter' && !event.shiftKey) {
+                event.preventDefault();
+                enviarMensagem();
+            }
+        }
+
+        function ajustarTamanho(textarea) {
+            textarea.style.height = 'auto';
+            textarea.style.height = Math.min(textarea.scrollHeight, 120) + 'px';
+        }
+
+        function iniciarCronometro() {
+            setInterval(() => {
+                if (inicioConsulta) {
+                    const agora = new Date();
+                    const diferenca = agora - inicioConsulta;
+                    const minutos = Math.floor(diferenca / 60000);
+                    const segundos = Math.floor((diferenca % 60000) / 1000);
+                    document.getElementById('tempo-consulta').textContent = 
+                        `${minutos.toString().padStart(2, '0')}:${segundos.toString().padStart(2, '0')}`;
+                }
+            }, 1000);
+        }
+
+        // Focar no primeiro campo ao carregar
+        window.addEventListener('load', () => {
+            document.getElementById('nome').focus();
+        });
+    </script>
+</body>
+</html>
+
