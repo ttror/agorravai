@@ -1,0 +1,1015 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dr. Alexandre Santos - Psiquiatra</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI",
+          Roboto, sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        color: #374151;
+      }
+
+      .consultorio-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        min-height: 100vh;
+        background: white;
+        box-shadow: 0 0 30px rgba(0, 0, 0, 0.1);
+        display: flex;
+        flex-direction: column;
+      }
+
+      /* HEADER MINIMALISTA */
+      .header-minimalista {
+        background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+        color: white;
+        padding: 12px 20px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      }
+
+      .doctor-info {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .doctor-avatar {
+        width: 40px;
+        height: 40px;
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.2em;
+      }
+
+      .doctor-details h1 {
+        font-size: 1.1em;
+        font-weight: 600;
+        margin-bottom: 2px;
+      }
+
+      .doctor-details p {
+        font-size: 0.75em;
+        opacity: 0.9;
+      }
+
+      .status-badge {
+        background: rgba(255, 255, 255, 0.2);
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 0.7em;
+        font-weight: 500;
+      }
+
+      /* DISCLAIMER COMPACTO */
+      .disclaimer {
+        background: #fef3c7;
+        border-left: 4px solid #f59e0b;
+        padding: 12px 20px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 0.8em;
+        color: #92400e;
+      }
+
+      /* ÁREA DE INPUT */
+      .area-input {
+        flex: 1;
+        padding: 25px;
+        overflow-y: auto;
+        max-height: 400px;
+      }
+
+      .form-title {
+        text-align: center;
+        margin-bottom: 20px;
+      }
+
+      .form-title h2 {
+        color: #1e40af;
+        font-size: 1.3em;
+        font-weight: 600;
+        margin-bottom: 5px;
+      }
+
+      .form-title p {
+        color: #6b7280;
+        font-size: 0.9em;
+      }
+
+      .form-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+        margin-bottom: 20px;
+      }
+
+      .form-group {
+        display: flex;
+        flex-direction: column;
+      }
+
+      .form-group.full-width {
+        grid-column: 1 / -1;
+      }
+
+      .form-group label {
+        font-weight: 600;
+        color: #374151;
+        margin-bottom: 8px;
+        font-size: 0.9em;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+
+      .form-group input,
+      .form-group select,
+      .form-group textarea {
+        padding: 12px 15px;
+        border: 2px solid #e5e7eb;
+        border-radius: 8px;
+        font-size: 1em;
+        transition: all 0.3s ease;
+        font-family: inherit;
+      }
+
+      .form-group input:focus,
+      .form-group select:focus,
+      .form-group textarea:focus {
+        outline: none;
+        border-color: #6366f1;
+        box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+      }
+
+      .form-group textarea {
+        resize: vertical;
+        min-height: 80px;
+        line-height: 1.5;
+      }
+
+      .btn-iniciar {
+        background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+        color: white;
+        border: none;
+        padding: 14px 30px;
+        border-radius: 8px;
+        font-size: 1em;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        width: 100%;
+        margin-top: 15px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+      }
+
+      .btn-iniciar:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 6px 16px rgba(99, 102, 241, 0.4);
+      }
+
+      /* CHAT CONTAINER */
+      .chat-container {
+        display: none;
+        flex-direction: column;
+        flex: 1;
+        background: white;
+      }
+
+      .chat-container.ativo {
+        display: flex;
+      }
+
+      .chat-messages {
+        flex: 1;
+        padding: 30px;
+        overflow-y: auto;
+        background: #fafbfc;
+        display: flex;
+        flex-direction: column;
+        gap: 25px;
+        min-height: 400px;
+      }
+
+      .mensagem {
+        display: flex;
+        gap: 15px;
+        max-width: 85%;
+        animation: slideIn 0.3s ease-out;
+      }
+
+      @keyframes slideIn {
+        from {
+          opacity: 0;
+          transform: translateY(15px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .mensagem.medico {
+        align-self: flex-start;
+      }
+
+      .mensagem.paciente {
+        align-self: flex-end;
+        flex-direction: row-reverse;
+      }
+
+      .avatar {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.2em;
+        font-weight: 600;
+        flex-shrink: 0;
+      }
+
+      .mensagem.medico .avatar {
+        background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+        color: white;
+      }
+
+      .mensagem.paciente .avatar {
+        background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+        color: white;
+      }
+
+      .conteudo-mensagem {
+        background: white;
+        padding: 25px 30px;
+        border-radius: 16px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        border: 1px solid #e2e8f0;
+        position: relative;
+        flex: 1;
+        min-width: 0;
+      }
+
+      .mensagem.medico .conteudo-mensagem {
+        border-left: 4px solid #3b82f6;
+      }
+
+      .mensagem.paciente .conteudo-mensagem {
+        border-right: 4px solid #6366f1;
+        background: #f8fafc;
+      }
+
+      .conteudo-mensagem p {
+        font-size: 1.1em;
+        line-height: 1.7;
+        color: #374151;
+        margin: 0;
+        word-wrap: break-word;
+      }
+
+      .timestamp {
+        font-size: 0.8em;
+        color: #9ca3af;
+        margin-top: 10px;
+        font-weight: 400;
+      }
+
+      /* ÁREA DE INPUT DO CHAT */
+      .chat-input {
+        padding: 25px 30px;
+        background: white;
+        border-top: 1px solid #e2e8f0;
+        display: flex;
+        gap: 15px;
+        align-items: flex-end;
+      }
+
+      .input-container {
+        flex: 1;
+        position: relative;
+      }
+
+      .chat-textarea {
+        width: 100%;
+        min-height: 60px;
+        max-height: 150px;
+        padding: 15px 20px;
+        border: 2px solid #e2e8f0;
+        border-radius: 12px;
+        font-size: 1.05em;
+        font-family: inherit;
+        resize: none;
+        transition: all 0.3s ease;
+        line-height: 1.5;
+      }
+
+      .chat-textarea:focus {
+        outline: none;
+        border-color: #6366f1;
+        box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+      }
+
+      .chat-textarea::placeholder {
+        color: #9ca3af;
+        font-size: 0.95em;
+      }
+
+      .btn-enviar {
+        background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+        color: white;
+        border: none;
+        width: 55px;
+        height: 55px;
+        border-radius: 50%;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.2em;
+        box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+      }
+
+      .btn-enviar:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 6px 16px rgba(99, 102, 241, 0.4);
+      }
+
+      .btn-finalizar {
+        background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+        color: white;
+        border: none;
+        padding: 10px 18px;
+        border-radius: 8px;
+        font-size: 0.9em;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+
+      .btn-finalizar:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+      }
+
+      /* LOADING STATE */
+      .loading {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        color: #6b7280;
+        font-style: italic;
+        font-size: 0.9em;
+      }
+
+      .loading-dots {
+        display: flex;
+        gap: 3px;
+      }
+
+      .loading-dots span {
+        width: 5px;
+        height: 5px;
+        background: #6366f1;
+        border-radius: 50%;
+        animation: bounce 1.4s infinite ease-in-out;
+      }
+
+      .loading-dots span:nth-child(1) {
+        animation-delay: -0.32s;
+      }
+      .loading-dots span:nth-child(2) {
+        animation-delay: -0.16s;
+      }
+
+      @keyframes bounce {
+        0%,
+        80%,
+        100% {
+          transform: scale(0);
+        }
+        40% {
+          transform: scale(1);
+        }
+      }
+
+      /* MODAL DE LOADING */
+      .loading-modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        backdrop-filter: blur(5px);
+        z-index: 1000;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .loading-content {
+        background: white;
+        padding: 40px;
+        border-radius: 16px;
+        text-align: center;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        max-width: 400px;
+        width: 90%;
+      }
+
+      .loading-avatar {
+        width: 80px;
+        height: 80px;
+        background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2em;
+        color: white;
+        margin: 0 auto 20px;
+        animation: pulse 2s infinite;
+      }
+
+      @keyframes pulse {
+        0%,
+        100% {
+          transform: scale(1);
+        }
+        50% {
+          transform: scale(1.05);
+        }
+      }
+
+      .loading-text h3 {
+        color: #1e40af;
+        font-size: 1.3em;
+        margin-bottom: 10px;
+      }
+
+      .loading-text p {
+        color: #6b7280;
+        font-size: 0.9em;
+        margin-bottom: 20px;
+      }
+
+      .loading-spinner {
+        display: flex;
+        justify-content: center;
+        gap: 5px;
+        margin-bottom: 15px;
+      }
+
+      .loading-spinner span {
+        width: 8px;
+        height: 8px;
+        background: #6366f1;
+        border-radius: 50%;
+        animation: bounce 1.4s infinite ease-in-out;
+      }
+
+      .loading-status {
+        color: #6b7280;
+        font-size: 0.8em;
+        font-style: italic;
+      }
+
+      /* RESPONSIVIDADE */
+      @media (max-width: 768px) {
+        .consultorio-container {
+          height: 100vh;
+          max-height: none;
+          border-radius: 0;
+          margin: 0;
+        }
+
+        .header-minimalista {
+          padding: 10px 15px;
+          border-radius: 0;
+        }
+
+        .doctor-details h1 {
+          font-size: 1em;
+        }
+
+        .doctor-details p {
+          font-size: 0.7em;
+        }
+
+        .form-grid {
+          grid-template-columns: 1fr;
+          gap: 15px;
+        }
+
+        .area-input {
+          margin: 10px;
+          padding: 20px;
+        }
+
+        .chat-messages {
+          padding: 20px 15px;
+          gap: 20px;
+        }
+
+        .chat-input {
+          padding: 15px;
+        }
+
+        .mensagem {
+          max-width: 90%;
+          gap: 12px;
+        }
+
+        .conteudo-mensagem {
+          padding: 20px 18px;
+        }
+
+        .conteudo-mensagem p {
+          font-size: 1em;
+          line-height: 1.6;
+        }
+
+        .chat-textarea {
+          font-size: 1em;
+          min-height: 50px;
+        }
+
+        .btn-enviar {
+          width: 45px;
+          height: 45px;
+          font-size: 1em;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="consultorio-container">
+      <!-- HEADER MINIMALISTA -->
+      <div class="header-minimalista">
+        <div class="doctor-info">
+          <div class="doctor-avatar">
+            <i class="fas fa-user-md"></i>
+          </div>
+          <div class="doctor-details">
+            <h1>Dr. Alexandre Santos</h1>
+            <p>
+              Médico Psiquiatra • CRM-SP 123456 • Especialização em
+              Psicofarmacologia
+            </p>
+          </div>
+        </div>
+        <div class="status-badge" id="statusBadge">Aguardando Paciente</div>
+      </div>
+
+      <!-- DISCLAIMER COMPACTO -->
+      <div class="disclaimer">
+        <i class="fas fa-exclamation-triangle"></i>
+        <div>
+          <strong>Consulta Médica Virtual:</strong>
+          Este é um atendimento psiquiátrico baseado em protocolos médicos
+          reais. Em emergências, procure imediatamente o pronto-socorro ou ligue
+          192.
+        </div>
+      </div>
+
+      <!-- ÁREA DE INPUT -->
+      <div class="area-input" id="areaInput">
+        <div class="form-title">
+          <h2>
+            <i class="fas fa-clipboard-list"></i> Ficha de Identificação do
+            Paciente
+          </h2>
+          <p>Por favor, preencha seus dados para iniciarmos a consulta.</p>
+        </div>
+
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="nome"
+              ><i class="fas fa-user"></i> Nome Completo *</label
+            >
+            <input
+              type="text"
+              id="nome"
+              placeholder="Digite seu nome completo"
+              required
+            />
+          </div>
+          <div class="form-group">
+            <label for="idade"
+              ><i class="fas fa-birthday-cake"></i> Idade *</label
+            >
+            <input
+              type="number"
+              id="idade"
+              placeholder="Idade"
+              min="1"
+              max="120"
+              required
+            />
+          </div>
+          <div class="form-group">
+            <label for="genero"><i class="fas fa-venus-mars"></i> Gênero</label>
+            <select id="genero">
+              <option value="selecione">Selecione</option>
+              <option value="masculino">Masculino</option>
+              <option value="feminino">Feminino</option>
+              <option value="nao-binario">Não-binário</option>
+              <option value="prefiro-nao-informar">Prefiro não informar</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="historico"
+              ><i class="fas fa-history"></i> Histórico Psiquiátrico</label
+            >
+            <select id="historico">
+              <option value="nunca">Nunca fiz tratamento psiquiátrico</option>
+              <option value="ja-fiz">
+                Já fiz tratamento psiquiátrico anteriormente
+              </option>
+              <option value="atual">Estou em tratamento atualmente</option>
+            </select>
+          </div>
+          <div class="form-group full-width">
+            <label for="motivo"
+              ><i class="fas fa-comment-medical"></i> Motivo Principal da
+              Consulta</label
+            >
+            <textarea
+              id="motivo"
+              placeholder="Descreva brevemente o que o trouxe aqui hoje..."
+            ></textarea>
+          </div>
+          <div class="form-group full-width">
+            <label for="medicamentos"
+              ><i class="fas fa-pills"></i> Medicamentos em Uso</label
+            >
+            <textarea
+              id="medicamentos"
+              placeholder="Liste os medicamentos que você usa atualmente (se houver)"
+            ></textarea>
+          </div>
+        </div>
+
+        <button class="btn-iniciar" onclick="iniciarConsulta()">
+          <i class="fas fa-stethoscope"></i>
+          Iniciar Consulta Médica
+        </button>
+      </div>
+
+      <!-- CHAT CONTAINER -->
+      <div class="chat-container" id="chatContainer">
+        <div class="chat-messages" id="chatMessages">
+          <!-- Mensagens aparecem aqui -->
+        </div>
+
+        <div class="chat-input">
+          <div class="input-container">
+            <textarea
+              id="chatInput"
+              class="chat-textarea"
+              placeholder="Descreva seus sintomas ou responda às perguntas do Dr. Alexandre..."
+              rows="3"
+            ></textarea>
+          </div>
+          <button
+            class="btn-enviar"
+            onclick="enviarMensagem()"
+            id="btnEnviar"
+            title="Enviar mensagem"
+          >
+            <i class="fas fa-paper-plane"></i>
+          </button>
+          <button
+            class="btn-finalizar"
+            onclick="finalizarConsulta()"
+            title="Finalizar consulta"
+          >
+            <i class="fas fa-times"></i> Finalizar
+          </button>
+        </div>
+      </div>
+
+      <!-- MODAL DE LOADING -->
+      <div class="loading-modal" id="loadingModal">
+        <div class="loading-content">
+          <div class="loading-avatar">
+            <i class="fas fa-user-md"></i>
+          </div>
+          <div class="loading-text">
+            <h3>Dr. Alexandre está analisando</h3>
+            <p>
+              Aguarde enquanto o Dr. Alexandre processa suas informações e
+              prepara uma resposta personalizada.
+            </p>
+          </div>
+          <div class="loading-spinner">
+            <span></span>
+            <span></span>
+            <span></span>
+          </div>
+          <div class="loading-status" id="loadingStatus">
+            Analisando sintomas e histórico médico...
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      let consultaAtiva = false;
+      let faseAtual = "acolhimento";
+      let dadosPaciente = {};
+
+      // Auto-resize textarea
+      document
+        .getElementById("chatInput")
+        .addEventListener("input", function () {
+          this.style.height = "auto";
+          this.style.height = this.scrollHeight + "px";
+        });
+
+      // Enter para enviar (Shift+Enter para nova linha)
+      document
+        .getElementById("chatInput")
+        .addEventListener("keydown", function (e) {
+          if (e.key === "Enter" && !e.shiftKey) {
+            e.preventDefault();
+            enviarMensagem();
+          }
+        });
+
+      function validarFormulario() {
+        const nome = document.getElementById("nome").value.trim();
+        const idade = document.getElementById("idade").value.trim();
+
+        let valido = true;
+
+        if (!nome) {
+          valido = false;
+        }
+
+        if (!idade || idade < 1 || idade > 120) {
+          valido = false;
+        }
+
+        return valido;
+      }
+
+      async function iniciarConsulta() {
+        if (!validarFormulario()) {
+          alert(
+            "Por favor, preencha pelo menos o nome e idade para continuar."
+          );
+          return;
+        }
+
+        // Mostrar modal de loading
+        mostrarModalLoading();
+
+        // Coletar dados do formulário
+        dadosPaciente = {
+          nome: document.getElementById("nome").value.trim(),
+          idade: document.getElementById("idade").value.trim(),
+          genero: document.getElementById("genero").value,
+          historico: document.getElementById("historico").value,
+          motivo: document.getElementById("motivo").value.trim(),
+          medicamentos: document.getElementById("medicamentos").value.trim(),
+        };
+
+        try {
+          const response = await fetch("/api/consulta/iniciar", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(dadosPaciente),
+          });
+
+          const data = await response.json();
+
+          // Esconder modal de loading
+          esconderModalLoading();
+
+          if (data.success) {
+            // Esconder formulário e mostrar chat
+            document.getElementById("areaInput").style.display = "none";
+            const chatContainer = document.getElementById("chatContainer");
+            chatContainer.classList.add("ativo");
+
+            // Atualizar status
+            document.getElementById(
+              "statusBadge"
+            ).textContent = `Em Consulta - ${data.fase}`;
+
+            consultaAtiva = true;
+            faseAtual = data.fase;
+
+            // Adicionar mensagem do médico
+            adicionarMensagem("medico", data.resposta);
+          } else {
+            alert("Erro ao iniciar consulta: " + data.message);
+          }
+        } catch (error) {
+          console.error("Erro:", error);
+          esconderModalLoading();
+          alert("Erro ao conectar com o Dr. Alexandre. Tente novamente.");
+        }
+      }
+
+      async function enviarMensagem() {
+        const input = document.getElementById("chatInput");
+        const mensagem = input.value.trim();
+
+        if (!mensagem || !consultaAtiva) return;
+
+        // Adicionar mensagem do paciente
+        adicionarMensagem("paciente", mensagem);
+        input.value = "";
+        input.style.height = "auto";
+
+        // Mostrar loading
+        mostrarLoading();
+
+        try {
+          const response = await fetch("/api/consulta/conversar", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              mensagem: mensagem,
+              fase: faseAtual,
+              dadosPaciente: dadosPaciente,
+            }),
+          });
+
+          const data = await response.json();
+
+          // Remover loading
+          removerLoading();
+
+          if (data.success) {
+            // Atualizar fase se mudou
+            if (data.fase !== faseAtual) {
+              faseAtual = data.fase;
+              document.getElementById(
+                "statusBadge"
+              ).textContent = `Em Consulta - ${data.fase}`;
+            }
+
+            // Adicionar resposta do médico
+            adicionarMensagem("medico", data.resposta);
+          } else {
+            adicionarMensagem(
+              "medico",
+              "Desculpe, houve um problema. Pode repetir sua mensagem?"
+            );
+          }
+        } catch (error) {
+          console.error("Erro:", error);
+          removerLoading();
+          adicionarMensagem(
+            "medico",
+            "Dr. Alexandre está temporariamente indisponível. Tente novamente."
+          );
+        }
+      }
+
+      function mostrarModalLoading() {
+        const modal = document.getElementById("loadingModal");
+        const status = document.getElementById("loadingStatus");
+
+        // Mensagens rotativas para o loading
+        const mensagens = [
+          "Conectando com Dr. Alexandre...",
+          "Preparando consultório virtual...",
+          "Analisando dados iniciais...",
+          "Iniciando consulta médica...",
+        ];
+
+        let indice = 0;
+        status.textContent = mensagens[indice];
+
+        modal.style.display = "flex";
+
+        // Rotacionar mensagens a cada 1.5 segundos
+        window.loadingInterval = setInterval(() => {
+          indice = (indice + 1) % mensagens.length;
+          status.textContent = mensagens[indice];
+        }, 1500);
+      }
+
+      function esconderModalLoading() {
+        const modal = document.getElementById("loadingModal");
+        modal.style.display = "none";
+
+        // Limpar intervalo das mensagens
+        if (window.loadingInterval) {
+          clearInterval(window.loadingInterval);
+          window.loadingInterval = null;
+        }
+      }
+
+      function adicionarMensagem(tipo, texto) {
+        const chatMessages = document.getElementById("chatMessages");
+        const mensagemDiv = document.createElement("div");
+        mensagemDiv.className = `mensagem ${tipo}`;
+
+        const agora = new Date();
+        const timestamp = agora.toLocaleTimeString("pt-BR", {
+          hour: "2-digit",
+          minute: "2-digit",
+        });
+
+        const avatar =
+          tipo === "medico"
+            ? '<i class="fas fa-user-md"></i>'
+            : dadosPaciente.nome
+            ? dadosPaciente.nome.charAt(0).toUpperCase()
+            : "P";
+
+        mensagemDiv.innerHTML = `
+                <div class="avatar">${avatar}</div>
+                <div class="conteudo-mensagem">
+                    <p>${texto}</p>
+                    <div class="timestamp">${timestamp}</div>
+                </div>
+            `;
+
+        chatMessages.appendChild(mensagemDiv);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+      }
+
+      function mostrarLoading() {
+        const chatMessages = document.getElementById("chatMessages");
+        const loadingDiv = document.createElement("div");
+        loadingDiv.className = "mensagem medico loading-message";
+        loadingDiv.innerHTML = `
+                <div class="avatar"><i class="fas fa-user-md"></i></div>
+                <div class="conteudo-mensagem">
+                    <div class="loading">
+                        Dr. Alexandre está analisando
+                        <div class="loading-dots">
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                        </div>
+                    </div>
+                </div>
+            `;
+        chatMessages.appendChild(loadingDiv);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+      }
+
+      function removerLoading() {
+        const loadingMessage = document.querySelector(".loading-message");
+        if (loadingMessage) {
+          loadingMessage.remove();
+        }
+      }
+
+      function finalizarConsulta() {
+        if (confirm("Tem certeza que deseja finalizar a consulta?")) {
+          consultaAtiva = false;
+          document.getElementById("statusBadge").textContent =
+            "Consulta Finalizada";
+          document.getElementById("chatInput").disabled = true;
+          document.getElementById("btnEnviar").disabled = true;
+
+          adicionarMensagem(
+            "medico",
+            "Consulta finalizada. Obrigado pela confiança. Cuide-se bem e não hesite em retornar se precisar."
+          );
+        }
+      }
+    </script>
+  </body>
+</html>
