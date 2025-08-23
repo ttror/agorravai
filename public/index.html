@@ -3,14 +3,10 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Dr. Alexandre Santos - Consultório Psiquiátrico</title>
+    <title>Consulta com Dr. Alexandre</title>
     <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
       rel="stylesheet"
-    />
-    <link
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
-      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
     />
     <style>
       * {
@@ -20,1113 +16,1261 @@
       }
 
       body {
-        font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI",
-          Roboto, sans-serif;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        min-height: 100vh;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        padding: 15px;
-        line-height: 1.6;
-      }
-
-      .consultorio-container {
-        background: white;
-        border-radius: 16px;
-        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-        max-width: 1400px;
-        width: 100%;
-        height: 95vh;
-        max-height: 900px;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto",
+          sans-serif;
+        background-color: #ffffff;
+        color: #2d333a;
+        height: 100vh;
         display: flex;
         flex-direction: column;
-        overflow: hidden;
       }
 
-      /* HEADER MINIMALISTA */
-      .header-minimalista {
-        background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
-        color: white;
-        padding: 12px 20px;
+      /* Header */
+      .header {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        font-size: 14px;
+        color: #6b7280;
         display: flex;
         align-items: center;
-        justify-content: space-between;
-        border-radius: 16px 16px 0 0;
-        box-shadow: 0 2px 8px rgba(79, 70, 229, 0.15);
+        gap: 15px;
+      }
+
+      .fase-consulta {
+        font-size: 13px;
+        color: #6b7280;
+        background-color: #f3f4f6;
+        padding: 4px 12px;
+        border-radius: 12px;
       }
 
       .doctor-info {
-        display: flex;
-        align-items: center;
-        gap: 12px;
+        font-size: 12px;
+        color: #9ca3af;
       }
 
-      .doctor-avatar {
-        width: 40px;
-        height: 40px;
-        background: rgba(255, 255, 255, 0.2);
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 1.2em;
-        border: 2px solid rgba(255, 255, 255, 0.3);
-      }
-
-      .doctor-details h1 {
-        margin: 0;
-        font-size: 1.1em;
-        font-weight: 600;
-      }
-
-      .doctor-details p {
-        margin: 0;
-        opacity: 0.9;
-        font-size: 0.75em;
-        font-weight: 400;
-      }
-
-      .status-badge {
-        background: rgba(255, 255, 255, 0.2);
-        padding: 4px 10px;
-        border-radius: 12px;
-        font-weight: 500;
-        font-size: 0.75em;
-        border: 1px solid rgba(255, 255, 255, 0.3);
-      }
-
-      /* DISCLAIMER COMPACTO */
-      .disclaimer-compacto {
-        background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
-        border-left: 3px solid #f59e0b;
-        padding: 12px 20px;
-        font-size: 0.8em;
-        color: #92400e;
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        font-weight: 500;
-      }
-
-      .disclaimer-compacto i {
-        font-size: 1em;
-        color: #f59e0b;
-      }
-
-      /* ÁREA PRINCIPAL */
-      .area-principal {
-        flex: 1;
-        display: flex;
-        flex-direction: column;
-        background: #f8fafc;
-        position: relative;
-      }
-
-      /* FORMULÁRIO INICIAL COMPACTO */
-      .area-input {
-        padding: 25px;
-        overflow-y: auto;
-        max-height: 400px;
-        background: white;
-        margin: 15px;
-        border-radius: 12px;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-        border: 1px solid #e2e8f0;
-      }
-
-      .ficha-titulo {
-        text-align: center;
-        margin-bottom: 25px;
-      }
-
-      .ficha-titulo h2 {
-        color: #1e40af;
-        font-size: 1.3em;
-        font-weight: 600;
-        margin-bottom: 5px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 8px;
-      }
-
-      .ficha-titulo p {
-        color: #64748b;
-        font-size: 0.9em;
-        font-weight: 400;
-      }
-
-      .form-grid {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 20px;
-        margin-bottom: 20px;
-      }
-
-      .form-group {
-        display: flex;
-        flex-direction: column;
-      }
-
-      .form-group.full-width {
-        grid-column: 1 / -1;
-      }
-
-      .form-group label {
-        font-weight: 600;
-        color: #374151;
-        margin-bottom: 6px;
-        font-size: 0.85em;
-        display: flex;
-        align-items: center;
-        gap: 6px;
-      }
-
-      .form-group label i {
-        color: #6366f1;
-        font-size: 0.8em;
-      }
-
-      .form-group input,
-      .form-group select,
-      .form-group textarea {
-        padding: 12px 15px;
-        border: 2px solid #e2e8f0;
-        border-radius: 8px;
-        font-size: 0.9em;
-        font-family: inherit;
-        transition: all 0.3s ease;
-        background: white;
-        color: #374151;
-      }
-
-      .form-group input:focus,
-      .form-group select:focus,
-      .form-group textarea:focus {
-        outline: none;
-        border-color: #6366f1;
-        box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
-      }
-
-      .form-group textarea {
-        resize: vertical;
-        min-height: 80px;
-        line-height: 1.5;
-      }
-
-      .btn-iniciar {
-        background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
-        color: white;
-        border: none;
-        padding: 14px 30px;
-        border-radius: 8px;
-        font-size: 1em;
-        font-weight: 600;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        width: 100%;
-        margin-top: 15px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 8px;
-        box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
-      }
-
-      .btn-iniciar:hover {
-        transform: translateY(-1px);
-        box-shadow: 0 6px 16px rgba(99, 102, 241, 0.4);
-      }
-
-      /* CHAT AMPLO */
+      /* Main Chat Container */
       .chat-container {
-        display: none;
         flex: 1;
-        flex-direction: column;
-        background: white;
-        margin: 15px;
-        border-radius: 12px;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-        border: 1px solid #e2e8f0;
-        overflow: hidden;
-        height: 80vh;
-        max-height: 600px;
-      }
-
-      .chat-container.ativo {
         display: flex;
+        flex-direction: column;
+        max-width: 768px;
+        margin: 0 auto;
+        width: 100%;
+        padding: 60px 20px 20px;
       }
 
       .chat-messages {
         flex: 1;
-        padding: 30px 40px;
-        overflow-y: auto;
-        background: #fafbfc;
         display: flex;
         flex-direction: column;
-        gap: 25px;
-        min-height: 300px;
-        max-height: 450px;
+        gap: 24px;
+        padding: 20px 0;
+        overflow-y: auto;
+        max-height: calc(100vh - 200px);
       }
 
-      .mensagem {
+      .message {
         display: flex;
-        gap: 15px;
-        max-width: 85%;
-        animation: slideIn 0.3s ease-out;
+        align-items: flex-start;
+        gap: 12px;
       }
 
-      @keyframes slideIn {
-        from {
-          opacity: 0;
-          transform: translateY(15px);
-        }
-        to {
-          opacity: 1;
-          transform: translateY(0);
-        }
-      }
-
-      .mensagem.medico {
-        align-self: flex-start;
-      }
-
-      .mensagem.paciente {
-        align-self: flex-end;
+      .message.user {
         flex-direction: row-reverse;
+        justify-content: flex-start;
       }
 
-      .avatar {
-        width: 45px;
-        height: 45px;
-        border-radius: 50%;
+      .message.assistant {
+        justify-content: flex-start;
+      }
+
+      .message-content {
+        background-color: transparent;
+        padding: 0;
+        font-size: 16px;
+        line-height: 1.6;
+        color: #2d333a;
+        max-width: 80%;
+        white-space: pre-wrap;
+      }
+
+      .message.user .message-content {
+        text-align: right;
+        background-color: #f7f7f8;
+        padding: 12px 16px;
+        border-radius: 18px;
+        border-bottom-right-radius: 4px;
+        color: #2d333a;
+      }
+
+      .message.assistant .message-content {
+        text-align: left;
+      }
+
+      /* Cursor de digitação */
+      .typing-cursor {
+        display: inline-block;
+        width: 2px;
+        height: 16px;
+        background-color: #10a37f;
+        margin-left: 2px;
+        animation: blink 1s infinite;
+      }
+
+      @keyframes blink {
+        0%,
+        100% {
+          opacity: 1;
+        }
+        50% {
+          opacity: 0;
+        }
+      }
+
+      /* Loading dots */
+      .loading-dots {
         display: flex;
         align-items: center;
-        justify-content: center;
-        font-size: 1.2em;
-        font-weight: 600;
-        flex-shrink: 0;
+        justify-content: flex-start;
+        margin: 20px 0;
       }
 
-      .mensagem.medico .avatar {
-        background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
-        color: white;
+      .dot {
+        width: 8px;
+        height: 8px;
+        background-color: #10a37f;
+        border-radius: 50%;
+        margin: 0 3px;
+        animation: pulse 1.5s infinite ease-in-out;
       }
 
-      .mensagem.paciente .avatar {
-        background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
-        color: white;
+      .dot:nth-child(2) {
+        animation-delay: 0.2s;
+      }
+      .dot:nth-child(3) {
+        animation-delay: 0.4s;
       }
 
-      .conteudo-mensagem {
-        background: white;
-        padding: 25px 30px;
-        border-radius: 16px;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-        border: 1px solid #e2e8f0;
-        position: relative;
-        flex: 1;
-        min-width: 0;
+      @keyframes pulse {
+        0%,
+        100% {
+          transform: scale(0.8);
+          opacity: 0.5;
+        }
+        50% {
+          transform: scale(1.2);
+          opacity: 1;
+        }
       }
 
-      .mensagem.medico .conteudo-mensagem {
-        border-left: 4px solid #3b82f6;
-      }
-
-      .mensagem.paciente .conteudo-mensagem {
-        border-right: 4px solid #6366f1;
-        background: #f8fafc;
-      }
-
-      .conteudo-mensagem p {
-        font-size: 1.1em;
-        line-height: 1.7;
-        color: #374151;
-        margin: 0;
-        word-wrap: break-word;
-      }
-
-      .timestamp {
-        font-size: 0.8em;
-        color: #9ca3af;
-        margin-top: 10px;
-        font-weight: 400;
-      }
-
-      /* ÁREA DE INPUT AMPLA */
-      .chat-input {
-        padding: 20px 25px;
-        background: white;
-        border-top: 1px solid #e2e8f0;
-        display: flex !important;
-        gap: 15px;
-        align-items: flex-end;
-        flex-shrink: 0;
-        min-height: 100px;
-        position: relative;
+      /* Input Area */
+      .input-area {
+        position: sticky;
         bottom: 0;
+        background-color: #ffffff;
+        padding: 20px;
+        border-top: 1px solid #e5e7eb;
       }
 
       .input-container {
-        flex: 1;
+        max-width: 768px;
+        margin: 0 auto;
         position: relative;
+        background-color: #f7f7f8;
+        border-radius: 25px;
+        border: 1px solid #e5e7eb;
+        display: flex;
+        align-items: center;
+        padding: 12px 20px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
       }
 
-      .chat-textarea {
-        width: 100%;
-        min-height: 60px;
-        max-height: 150px;
-        padding: 15px 20px;
-        border: 2px solid #e2e8f0;
-        border-radius: 12px;
-        font-size: 1em;
-        font-family: inherit;
-        resize: none;
-        transition: all 0.3s ease;
-        line-height: 1.5;
-      }
-
-      .chat-textarea:focus {
-        outline: none;
-        border-color: #6366f1;
-        box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
-      }
-
-      .chat-textarea::placeholder {
-        color: #9ca3af;
-        font-size: 0.95em;
-      }
-
-      .btn-enviar {
-        background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
-        color: white;
-        border: none;
-        width: 50px;
-        height: 50px;
-        border-radius: 50%;
+      .plus-icon {
+        width: 20px;
+        height: 20px;
+        margin-right: 12px;
         cursor: pointer;
-        transition: all 0.3s ease;
+        color: #6b7280;
+        font-size: 18px;
+        font-weight: bold;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 1.2em;
-        box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
       }
 
-      .btn-enviar:hover {
-        transform: translateY(-1px);
-        box-shadow: 0 6px 16px rgba(99, 102, 241, 0.4);
-      }
-
-      .btn-finalizar {
-        background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
-        color: white;
+      .input-field {
+        flex: 1;
+        background: transparent;
         border: none;
-        padding: 8px 16px;
-        border-radius: 8px;
-        font-size: 0.85em;
-        font-weight: 600;
+        outline: none;
+        color: #2d333a;
+        font-size: 16px;
+        font-family: inherit;
+        resize: none;
+        min-height: 24px;
+        max-height: 200px;
+      }
+
+      .input-field::placeholder {
+        color: #9ca3af;
+      }
+
+      .input-icons {
+        display: flex;
+        gap: 12px;
+        margin-left: 12px;
+      }
+
+      .input-icon {
+        width: 20px;
+        height: 20px;
         cursor: pointer;
-        transition: all 0.3s ease;
-        display: flex;
-        align-items: center;
-        gap: 6px;
-      }
-
-      .btn-finalizar:hover {
-        transform: translateY(-1px);
-        box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
-      }
-
-      /* LOADING STATE */
-      .loading {
-        display: flex;
-        align-items: center;
-        gap: 8px;
         color: #6b7280;
-        font-style: italic;
-        font-size: 0.9em;
-      }
-
-      .loading-dots {
         display: flex;
-        gap: 3px;
+        align-items: center;
+        justify-content: center;
       }
 
-      .loading-dots span {
-        width: 5px;
-        height: 5px;
-        background: #6366f1;
-        border-radius: 50%;
-        animation: bounce 1.4s infinite ease-in-out;
+      .send-button {
+        background: none;
+        border: none;
+        cursor: pointer;
+        color: #10a37f;
+        font-size: 18px;
+        padding: 5px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
       }
 
-      .loading-dots span:nth-child(1) {
-        animation-delay: -0.32s;
-      }
-      .loading-dots span:nth-child(2) {
-        animation-delay: -0.16s;
+      .send-button:disabled {
+        color: #ccc;
+        cursor: not-allowed;
       }
 
-      @keyframes bounce {
-        0%,
-        80%,
-        100% {
-          transform: scale(0);
-        }
-        40% {
-          transform: scale(1);
-        }
+      .disclaimer {
+        text-align: center;
+        margin-top: 12px;
+        font-size: 12px;
+        color: #9ca3af;
       }
 
-      /* RESPONSIVIDADE */
-      @media (max-width: 768px) {
-        .consultorio-container {
-          height: 100vh;
-          max-height: none;
-          border-radius: 0;
-          margin: 0;
-        }
-
-        .header-minimalista {
-          padding: 10px 15px;
-          border-radius: 0;
-        }
-
-        .doctor-details h1 {
-          font-size: 1em;
-        }
-
-        .doctor-details p {
-          font-size: 0.7em;
-        }
-
-        .form-grid {
-          grid-template-columns: 1fr;
-          gap: 15px;
-        }
-
-        .area-input {
-          margin: 10px;
-          padding: 20px;
-        }
-
-        .chat-container {
-          margin: 10px;
-        }
-
-        .chat-messages {
-          padding: 20px 15px;
-          gap: 20px;
-          min-height: 500px;
-        }
-
-        .mensagem {
-          max-width: 90%;
-          gap: 12px;
-        }
-
-        .conteudo-mensagem {
-          padding: 20px 18px;
-        }
-
-        .conteudo-mensagem p {
-          font-size: 1em;
-          line-height: 1.6;
-        }
-
-        .chat-input {
-          padding: 15px;
-          gap: 12px;
-        }
-
-        .avatar {
-          width: 40px;
-          height: 40px;
-          font-size: 1.1em;
-        }
-
-        .btn-enviar {
-          width: 45px;
-          height: 45px;
-          font-size: 1.1em;
-        }
+      /* Sidebar - Hidden by default, can be toggled */
+      .sidebar {
+        position: fixed;
+        top: 0;
+        left: -300px;
+        width: 300px;
+        height: 100vh;
+        background-color: #f8f9fa;
+        border-right: 1px solid #e5e7eb;
+        transition: left 0.3s ease;
+        z-index: 1000;
+        display: flex;
+        flex-direction: column;
+        padding: 20px;
       }
 
-      /* MODAL DE LOADING */
-      .loading-modal {
+      .sidebar.open {
+        left: 0;
+      }
+
+      .sidebar-header {
+        margin-bottom: 20px;
+      }
+
+      .new-chat-btn {
+        width: 100%;
+        padding: 12px;
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        background: #ffffff;
+        color: #374151;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        font-size: 14px;
+        transition: background-color 0.2s;
+      }
+
+      .new-chat-btn:hover {
+        background-color: #f3f4f6;
+      }
+
+      .new-chat-btn i {
+        margin-right: 10px;
+      }
+
+      .chat-history {
+        flex: 1;
+        overflow-y: auto;
+      }
+
+      .chat-item {
+        padding: 12px;
+        margin: 5px 0;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 14px;
+        display: flex;
+        align-items: center;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        position: relative;
+        color: #374151;
+      }
+
+      .chat-item:hover {
+        background-color: #f3f4f6;
+      }
+
+      .chat-item.active {
+        background-color: #e5f3ff;
+        color: #1d4ed8;
+      }
+
+      .chat-item i {
+        margin-right: 10px;
+        font-size: 12px;
+      }
+
+      .chat-item-actions {
+        position: absolute;
+        right: 5px;
+        display: none;
+      }
+
+      .chat-item:hover .chat-item-actions {
+        display: flex;
+      }
+
+      .chat-item-action {
+        color: #6b7280;
+        padding: 3px;
+        cursor: pointer;
+        font-size: 12px;
+      }
+
+      .chat-item-action:hover {
+        color: #374151;
+      }
+
+      /* Menu toggle button */
+      .menu-toggle {
+        position: fixed;
+        top: 20px;
+        left: 20px;
+        width: 40px;
+        height: 40px;
+        background-color: #f7f7f8;
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1001;
+        color: #6b7280;
+      }
+
+      .menu-toggle:hover {
+        background-color: #f3f4f6;
+      }
+
+      /* Modal */
+      .modal-overlay {
         position: fixed;
         top: 0;
         left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0, 0, 0, 0.7);
+        right: 0;
+        bottom: 0;
+        background-color: rgba(0, 0, 0, 0.5);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 2000;
         display: none;
-        align-items: center;
-        justify-content: center;
-        z-index: 1000;
-        backdrop-filter: blur(5px);
       }
 
-      .loading-content {
-        background: white;
-        padding: 40px;
-        border-radius: 20px;
-        text-align: center;
-        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
-        max-width: 400px;
-        width: 90%;
-        animation: modalAppear 0.3s ease-out;
+      .modal {
+        background-color: #fff;
+        border-radius: 12px;
+        padding: 24px;
+        width: 400px;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
       }
 
-      @keyframes modalAppear {
-        from {
-          opacity: 0;
-          transform: scale(0.8) translateY(-20px);
-        }
-        to {
-          opacity: 1;
-          transform: scale(1) translateY(0);
-        }
-      }
-
-      .loading-avatar {
-        width: 80px;
-        height: 80px;
-        background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
-        border-radius: 50%;
+      .modal-header {
         display: flex;
+        justify-content: space-between;
         align-items: center;
-        justify-content: center;
-        font-size: 2em;
-        color: white;
-        margin: 0 auto 20px auto;
-        animation: pulse 2s infinite;
+        margin-bottom: 20px;
       }
 
-      .loading-text h3 {
-        color: #1e40af;
-        font-size: 1.4em;
+      .modal-title {
         font-weight: 600;
-        margin-bottom: 10px;
+        font-size: 18px;
+        color: #1f2937;
       }
 
-      .loading-text p {
-        color: #64748b;
-        font-size: 1em;
-        margin-bottom: 25px;
-        line-height: 1.5;
+      .modal-close {
+        background: none;
+        border: none;
+        font-size: 24px;
+        cursor: pointer;
+        color: #6b7280;
       }
 
-      .loading-spinner {
+      .modal-input {
+        width: 100%;
+        padding: 12px;
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        font-size: 14px;
+      }
+
+      .modal-buttons {
         display: flex;
-        justify-content: center;
-        gap: 8px;
-        margin-bottom: 15px;
+        justify-content: flex-end;
+        gap: 12px;
       }
 
-      .loading-spinner span {
-        width: 12px;
-        height: 12px;
-        background: #6366f1;
-        border-radius: 50%;
-        animation: bounce 1.4s infinite ease-in-out;
-      }
-
-      .loading-spinner span:nth-child(1) {
-        animation-delay: -0.32s;
-      }
-      .loading-spinner span:nth-child(2) {
-        animation-delay: -0.16s;
-      }
-      .loading-spinner span:nth-child(3) {
-        animation-delay: 0s;
-      }
-
-      .loading-status {
-        color: #6366f1;
-        font-size: 0.9em;
+      .modal-button {
+        padding: 10px 20px;
+        border-radius: 8px;
+        font-size: 14px;
+        cursor: pointer;
         font-weight: 500;
-        font-style: italic;
       }
 
-      /* ESTADOS DE VALIDAÇÃO */
-      .form-group.error input,
-      .form-group.error select,
-      .form-group.error textarea {
-        border-color: #ef4444;
-        box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+      .modal-button-cancel {
+        background-color: #f3f4f6;
+        border: 1px solid #d1d5db;
+        color: #374151;
       }
 
-      .form-group.success input,
-      .form-group.success select,
-      .form-group.success textarea {
-        border-color: #22c55e;
-        box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.1);
+      .modal-button-confirm {
+        background-color: #10a37f;
+        border: 1px solid #10a37f;
+        color: white;
+      }
+
+      /* Responsive */
+      @media (max-width: 768px) {
+        .chat-container {
+          padding: 80px 16px 16px;
+        }
+
+        .input-area {
+          padding: 16px;
+        }
+
+        .message-content {
+          max-width: 90%;
+        }
+
+        .header {
+          top: 15px;
+          right: 15px;
+          font-size: 12px;
+        }
+      }
+
+      /* Hover effects */
+      .input-icon:hover,
+      .plus-icon:hover {
+        color: #374151;
+      }
+
+      /* Overlay when sidebar is open */
+      .sidebar-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: rgba(0, 0, 0, 0.3);
+        z-index: 999;
+        display: none;
+      }
+
+      .sidebar-overlay.active {
+        display: block;
       }
     </style>
   </head>
   <body>
-    <div class="consultorio-container">
-      <!-- HEADER MINIMALISTA -->
-      <div class="header-minimalista">
-        <div class="doctor-info">
-          <div class="doctor-avatar">
-            <i class="fas fa-user-md"></i>
-          </div>
-          <div class="doctor-details">
-            <h1>Dr. Alexandre Santos</h1>
-            <p>
-              Médico Psiquiatra • CRM-SP 123456 • Especialização em
-              Psicofarmacologia
-            </p>
-          </div>
+    <!-- Menu Toggle Button -->
+    <button class="menu-toggle" id="menuToggle">
+      <i class="fas fa-bars"></i>
+    </button>
+
+    <!-- Sidebar Overlay -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <button class="new-chat-btn" id="newChatBtn">
+          <i class="fas fa-plus"></i> Nova conversa
+        </button>
+      </div>
+
+      <div class="chat-history" id="chatHistory">
+        <!-- Histórico de conversas será adicionado aqui dinamicamente -->
+      </div>
+    </div>
+
+    <!-- Header -->
+    <div class="header">
+      <div class="doctor-info">Dr. Alberts, CAIO PHd - CRM-SP 123456</div>
+      <div class="fase-consulta" id="faseConsulta">Iniciando consulta</div>
+    </div>
+
+    <!-- Main Chat Container -->
+    <div class="chat-container">
+      <div class="chat-messages" id="chatMessages">
+        <!-- Mensagens aparecerão aqui -->
+      </div>
+    </div>
+
+    <!-- Input Area -->
+    <div class="input-area">
+      <div class="input-container">
+        <div class="plus-icon" id="micButton" title="Opções adicionais">+</div>
+        <textarea
+          class="input-field"
+          id="userInput"
+          placeholder="Digite sua mensagem para o Dr. Alexandre..."
+          rows="1"
+          aria-label="Mensagem"
+        ></textarea>
+        <button
+          class="send-button"
+          id="sendButton"
+          disabled
+          title="Enviar mensagem"
+        >
+          <i class="fas fa-paper-plane"></i>
+        </button>
+      </div>
+      <p class="disclaimer">
+        pode cometer erros. Verifique informações importantes.
+      </p>
+    </div>
+
+    <!-- Modal para renomear conversa -->
+    <div class="modal-overlay" id="renameModal">
+      <div class="modal">
+        <div class="modal-header">
+          <div class="modal-title">Renomear conversa</div>
+          <button class="modal-close" id="closeRenameModal">&times;</button>
         </div>
-        <div class="status-badge" id="statusBadge">Aguardando Paciente</div>
-      </div>
-
-      <!-- DISCLAIMER COMPACTO -->
-      <div class="disclaimer-compacto">
-        <i class="fas fa-exclamation-triangle"></i>
-        <strong>Consulta Médica Virtual:</strong> Este é um atendimento
-        psiquiátrico baseado em protocolos médicos reais. Em emergências,
-        procure imediatamente o pronto-socorro ou ligue 192.
-      </div>
-
-      <!-- ÁREA PRINCIPAL -->
-      <div class="area-principal">
-        <!-- FORMULÁRIO INICIAL -->
-        <div class="area-input" id="areaInput">
-          <div class="ficha-titulo">
-            <h2>
-              <i class="fas fa-clipboard-list"></i> Ficha de Identificação do
-              Paciente
-            </h2>
-            <p>Por favor, preencha seus dados para iniciarmos a consulta.</p>
-          </div>
-
-          <div class="form-grid">
-            <div class="form-group">
-              <label for="nome"
-                ><i class="fas fa-user"></i> Nome Completo *</label
-              >
-              <input
-                type="text"
-                id="nome"
-                placeholder="Digite seu nome completo"
-                required
-              />
-            </div>
-            <div class="form-group">
-              <label for="idade"
-                ><i class="fas fa-calendar-alt"></i> Idade *</label
-              >
-              <input
-                type="number"
-                id="idade"
-                placeholder="Idade"
-                min="1"
-                max="120"
-                required
-              />
-            </div>
-            <div class="form-group">
-              <label for="genero"
-                ><i class="fas fa-venus-mars"></i> Gênero</label
-              >
-              <select id="genero">
-                <option value="">Selecione</option>
-                <option value="masculino">Masculino</option>
-                <option value="feminino">Feminino</option>
-                <option value="nao-binario">Não-binário</option>
-                <option value="nao-informar">Prefiro não informar</option>
-              </select>
-            </div>
-            <div class="form-group">
-              <label for="historico"
-                ><i class="fas fa-history"></i> Histórico Psiquiátrico</label
-              >
-              <select id="historico">
-                <option value="nunca">Nunca fiz tratamento psiquiátrico</option>
-                <option value="ja-fiz">
-                  Já fiz tratamento psiquiátrico anteriormente
-                </option>
-                <option value="atual">Estou em tratamento atualmente</option>
-              </select>
-            </div>
-            <div class="form-group full-width">
-              <label for="motivo"
-                ><i class="fas fa-comment-medical"></i> Motivo Principal da
-                Consulta</label
-              >
-              <textarea
-                id="motivo"
-                placeholder="Descreva brevemente o que o trouxe aqui hoje..."
-              ></textarea>
-            </div>
-            <div class="form-group full-width">
-              <label for="medicamentos"
-                ><i class="fas fa-pills"></i> Medicamentos em Uso</label
-              >
-              <textarea
-                id="medicamentos"
-                placeholder="Liste os medicamentos que você usa atualmente (se houver)"
-              ></textarea>
-            </div>
-          </div>
-
-          <button class="btn-iniciar" onclick="iniciarConsulta()">
-            <i class="fas fa-stethoscope"></i>
-            Iniciar Consulta Médica
+        <input
+          type="text"
+          class="modal-input"
+          id="conversaTituloInput"
+          placeholder="Digite o novo título"
+        />
+        <div class="modal-buttons">
+          <button class="modal-button modal-button-cancel" id="cancelRename">
+            Cancelar
           </button>
-        </div>
-
-        <!-- CHAT MÉDICO -->
-        <div class="chat-container" id="chatContainer">
-          <div class="chat-messages" id="chatMessages">
-            <!-- Mensagens aparecerão aqui -->
-          </div>
-
-          <div class="chat-input">
-            <div class="input-container">
-              <textarea
-                class="chat-textarea"
-                id="chatInput"
-                placeholder="Descreva seus sintomas ou responda às perguntas do Dr. Alexandre..."
-                rows="3"
-              ></textarea>
-            </div>
-            <button
-              class="btn-enviar"
-              onclick="enviarMensagem()"
-              id="btnEnviar"
-            >
-              <i class="fas fa-paper-plane"></i>
-            </button>
-            <button class="btn-finalizar" onclick="finalizarConsulta()">
-              <i class="fas fa-times"></i> Finalizar
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <!-- MODAL DE LOADING -->
-      <div class="loading-modal" id="loadingModal">
-        <div class="loading-content">
-          <div class="loading-avatar">
-            <i class="fas fa-user-md"></i>
-          </div>
-          <div class="loading-text">
-            <h3>Dr. Alexandre está analisando</h3>
-            <p>
-              Aguarde enquanto o Dr. Alexandre processa suas informações e
-              prepara uma resposta personalizada.
-            </p>
-          </div>
-          <div class="loading-spinner">
-            <span></span>
-            <span></span>
-            <span></span>
-          </div>
-          <div class="loading-status" id="loadingStatus">
-            Analisando sintomas e histórico médico...
-          </div>
+          <button class="modal-button modal-button-confirm" id="confirmRename">
+            Salvar
+          </button>
         </div>
       </div>
     </div>
 
     <script>
-      let consultaAtiva = false;
-      let faseAtual = "acolhimento";
-      let dadosPaciente = {};
+      document.addEventListener("DOMContentLoaded", function () {
+        const chatMessages = document.getElementById("chatMessages");
+        const userInput = document.getElementById("userInput");
+        const sendButton = document.getElementById("sendButton");
+        const faseConsultaElement = document.getElementById("faseConsulta");
+        const micButton = document.getElementById("micButton");
+        const sidebar = document.getElementById("sidebar");
+        const sidebarOverlay = document.getElementById("sidebarOverlay");
+        const menuToggle = document.getElementById("menuToggle");
+        const newChatBtn = document.getElementById("newChatBtn");
+        const chatHistory = document.getElementById("chatHistory");
 
-      // Auto-resize textarea
-      document
-        .getElementById("chatInput")
-        .addEventListener("input", function () {
-          this.style.height = "auto";
-          this.style.height = this.scrollHeight + "px";
+        // Modal de renomear
+        const renameModal = document.getElementById("renameModal");
+        const conversaTituloInput = document.getElementById(
+          "conversaTituloInput"
+        );
+        const closeRenameModal = document.getElementById("closeRenameModal");
+        const cancelRename = document.getElementById("cancelRename");
+        const confirmRename = document.getElementById("confirmRename");
+        let conversaParaRenomear = null;
+
+        // Controle da sidebar
+        menuToggle.addEventListener("click", function () {
+          sidebar.classList.toggle("open");
+          sidebarOverlay.classList.toggle("active");
         });
 
-      // Enter para enviar (Shift+Enter para nova linha)
-      document
-        .getElementById("chatInput")
-        .addEventListener("keydown", function (e) {
-          if (e.key === "Enter" && !e.shiftKey) {
-            e.preventDefault();
-            enviarMensagem();
-          }
+        sidebarOverlay.addEventListener("click", function () {
+          sidebar.classList.remove("open");
+          sidebarOverlay.classList.remove("active");
         });
 
-      function validarFormulario() {
-        const nome = document.getElementById("nome").value.trim();
-        const idade = document.getElementById("idade").value.trim();
+        // Configurações da API
+        const API_URL = window.location.origin;
+        let sessaoId = null;
+        let faseConsulta = "acolhimento";
 
-        // Reset classes
-        document.querySelectorAll(".form-group").forEach((group) => {
-          group.classList.remove("error", "success");
-        });
-
-        let valido = true;
-
-        if (!nome) {
-          document
-            .getElementById("nome")
-            .closest(".form-group")
-            .classList.add("error");
-          valido = false;
-        } else {
-          document
-            .getElementById("nome")
-            .closest(".form-group")
-            .classList.add("success");
-        }
-
-        if (!idade || idade < 1 || idade > 120) {
-          document
-            .getElementById("idade")
-            .closest(".form-group")
-            .classList.add("error");
-          valido = false;
-        } else {
-          document
-            .getElementById("idade")
-            .closest(".form-group")
-            .classList.add("success");
-        }
-
-        return valido;
-      }
-
-      async function iniciarConsulta() {
-        if (!validarFormulario()) {
-          alert(
-            "Por favor, preencha pelo menos o nome e idade para continuar."
-          );
-          return;
-        }
-
-        // Mostrar modal de loading
-        mostrarModalLoading();
-
-        // Coletar dados do formulário
-        dadosPaciente = {
-          nome: document.getElementById("nome").value.trim(),
-          idade: document.getElementById("idade").value.trim(),
-          genero: document.getElementById("genero").value,
-          historico: document.getElementById("historico").value,
-          motivo: document.getElementById("motivo").value.trim(),
-          medicamentos: document.getElementById("medicamentos").value.trim(),
+        // Estado da consulta
+        let consultaIniciada = false;
+        let esperandoNome = true;
+        let esperandoIdade = false;
+        let dadosPaciente = {
+          nome: "",
+          idade: "",
+          genero: "",
+          motivo: "",
         };
 
-        try {
-          const response = await fetch("/api/consulta/iniciar", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify(dadosPaciente),
-          });
+        // Array para armazenar histórico de conversas
+        let conversas = [];
+        let conversaAtual = null;
 
-          const data = await response.json();
+        // Iniciar com mensagem de boas-vindas
+        iniciarChat();
 
-          // Esconder modal de loading
-          esconderModalLoading();
-
-          if (data.success) {
-            // Esconder formulário e mostrar chat
-            document.getElementById("areaInput").style.display = "none";
-            const chatContainer = document.getElementById("chatContainer");
-            chatContainer.style.display = "flex";
-            chatContainer.classList.add("ativo");
-
-            // Atualizar status
-            document.getElementById(
-              "statusBadge"
-            ).textContent = `Em Consulta - ${data.fase}`;
-
-            consultaAtiva = true;
-            faseAtual = data.fase;
-
-            // Adicionar mensagem do médico
-            adicionarMensagem("medico", data.resposta);
-          } else {
-            alert("Erro ao iniciar consulta: " + data.message);
+        // Função para criar nova conversa
+        newChatBtn.addEventListener("click", function () {
+          // Salvar conversa atual se existir
+          if (conversaAtual) {
+            salvarConversaAtual();
           }
-        } catch (error) {
-          console.error("Erro:", error);
-          esconderModalLoading();
-          alert("Erro ao conectar com o Dr. Alexandre. Tente novamente.");
-        }
-      }
 
-      async function enviarMensagem() {
-        const input = document.getElementById("chatInput");
-        const mensagem = input.value.trim();
+          // Limpar chat atual
+          chatMessages.innerHTML = "";
 
-        if (!mensagem || !consultaAtiva) return;
+          // Criar nova conversa
+          conversaAtual = {
+            id: Date.now(),
+            titulo: "Nova conversa",
+            mensagens: [],
+          };
 
-        // Adicionar mensagem do paciente
-        adicionarMensagem("paciente", mensagem);
-        input.value = "";
-        input.style.height = "auto";
+          // Reiniciar estado da consulta
+          esperandoNome = true;
+          esperandoIdade = false;
+          dadosPaciente = {
+            nome: "",
+            idade: "",
+            genero: "",
+            motivo: "",
+          };
 
-        // Mostrar loading
-        mostrarLoading();
+          // Adicionar à lista de conversas
+          conversas.push(conversaAtual);
 
-        try {
-          const response = await fetch("/api/consulta/conversar", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              mensagem: mensagem,
-              fase: faseAtual,
-              dadosPaciente: dadosPaciente,
-            }),
-          });
+          // Atualizar sidebar
+          atualizarHistoricoConversas();
 
-          const data = await response.json();
+          // Fechar sidebar no mobile
+          sidebar.classList.remove("open");
+          sidebarOverlay.classList.remove("active");
 
-          // Remover loading
-          removerLoading();
-
-          if (data.success) {
-            // Atualizar fase se mudou
-            if (data.fase !== faseAtual) {
-              faseAtual = data.fase;
-              document.getElementById(
-                "statusBadge"
-              ).textContent = `Em Consulta - ${data.fase}`;
-            }
-
-            // Adicionar resposta do médico
-            adicionarMensagem("medico", data.resposta);
-          } else {
-            adicionarMensagem(
-              "medico",
-              "Desculpe, houve um problema. Pode repetir sua mensagem?"
-            );
-          }
-        } catch (error) {
-          console.error("Erro:", error);
-          removerLoading();
-          adicionarMensagem(
-            "medico",
-            "Dr. Alexandre está temporariamente indisponível. Tente novamente."
-          );
-        }
-      }
-
-      function mostrarModalLoading() {
-        const modal = document.getElementById("loadingModal");
-        const status = document.getElementById("loadingStatus");
-
-        // Mensagens rotativas para o loading
-        const mensagens = [
-          "Conectando com Dr. Alexandre...",
-          "Preparando consultório virtual...",
-          "Analisando dados iniciais...",
-          "Iniciando consulta médica...",
-        ];
-
-        let indice = 0;
-        status.textContent = mensagens[indice];
-
-        modal.style.display = "flex";
-
-        // Rotacionar mensagens a cada 1.5 segundos
-        window.loadingInterval = setInterval(() => {
-          indice = (indice + 1) % mensagens.length;
-          status.textContent = mensagens[indice];
-        }, 1500);
-      }
-
-      function esconderModalLoading() {
-        const modal = document.getElementById("loadingModal");
-        modal.style.display = "none";
-
-        // Limpar intervalo das mensagens
-        if (window.loadingInterval) {
-          clearInterval(window.loadingInterval);
-          window.loadingInterval = null;
-        }
-      }
-
-      function adicionarMensagem(tipo, texto) {
-        const chatMessages = document.getElementById("chatMessages");
-        const mensagemDiv = document.createElement("div");
-        mensagemDiv.className = `mensagem ${tipo}`;
-
-        const agora = new Date();
-        const timestamp = agora.toLocaleTimeString("pt-BR", {
-          hour: "2-digit",
-          minute: "2-digit",
+          // Iniciar nova consulta
+          iniciarChat();
         });
 
-        const avatar =
-          tipo === "medico"
-            ? '<i class="fas fa-user-md"></i>'
-            : dadosPaciente.nome
-            ? dadosPaciente.nome.charAt(0).toUpperCase()
-            : "P";
+        // Função para salvar conversa atual
+        function salvarConversaAtual() {
+          if (!conversaAtual) return;
 
-        mensagemDiv.innerHTML = `
-                <div class="avatar">${avatar}</div>
-                <div class="conteudo-mensagem">
-                    <p>${texto}</p>
-                    <div class="timestamp">${timestamp}</div>
-                </div>
-            `;
+          // Capturar todas as mensagens do chat
+          const mensagensElements = chatMessages.querySelectorAll(".message");
+          conversaAtual.mensagens = [];
 
-        chatMessages.appendChild(mensagemDiv);
-        chatMessages.scrollTop = chatMessages.scrollHeight;
-      }
+          mensagensElements.forEach((msg) => {
+            const tipo = msg.classList.contains("user") ? "user" : "assistant";
+            const conteudo = msg.querySelector(".message-content").textContent;
+            conversaAtual.mensagens.push({ tipo, conteudo });
+          });
 
-      function mostrarLoading() {
-        const chatMessages = document.getElementById("chatMessages");
-        const loadingDiv = document.createElement("div");
-        loadingDiv.className = "mensagem medico loading-message";
-        loadingDiv.innerHTML = `
-                <div class="avatar"><i class="fas fa-user-md"></i></div>
-                <div class="conteudo-mensagem">
-                    <div class="loading">
-                        Dr. Alexandre está analisando
-                        <div class="loading-dots">
-                            <span></span>
-                            <span></span>
-                            <span></span>
-                        </div>
-                    </div>
-                </div>
-            `;
-        chatMessages.appendChild(loadingDiv);
-        chatMessages.scrollTop = chatMessages.scrollHeight;
-      }
-
-      function removerLoading() {
-        const loadingMessage = document.querySelector(".loading-message");
-        if (loadingMessage) {
-          loadingMessage.remove();
+          // Atualizar título com base na primeira mensagem do usuário (se existir)
+          if (!conversaAtual.tituloPersonalizado) {
+            const primeiraMensagemUsuario = conversaAtual.mensagens.find(
+              (m) => m.tipo === "user"
+            );
+            if (primeiraMensagemUsuario) {
+              conversaAtual.titulo =
+                primeiraMensagemUsuario.conteudo.substring(0, 20) +
+                (primeiraMensagemUsuario.conteudo.length > 20 ? "..." : "");
+            }
+          }
         }
-      }
 
-      function finalizarConsulta() {
-        if (confirm("Tem certeza que deseja finalizar a consulta?")) {
-          consultaAtiva = false;
-          document.getElementById("statusBadge").textContent =
-            "Consulta Finalizada";
-          document.getElementById("chatInput").disabled = true;
-          document.getElementById("btnEnviar").disabled = true;
+        // Função para atualizar histórico de conversas na sidebar
+        function atualizarHistoricoConversas() {
+          chatHistory.innerHTML = "";
 
-          adicionarMensagem(
-            "medico",
-            "Consulta finalizada. Obrigado pela confiança. Cuide-se bem e não hesite em retornar se precisar."
+          conversas.forEach((conversa) => {
+            const chatItem = document.createElement("div");
+            chatItem.className = "chat-item";
+            if (conversaAtual && conversa.id === conversaAtual.id) {
+              chatItem.classList.add("active");
+            }
+
+            chatItem.innerHTML = `
+                        <i class="fas fa-comment"></i>
+                        <span class="chat-item-title">${conversa.titulo}</span>
+                        <div class="chat-item-actions">
+                            <span class="chat-item-action rename-chat" title="Renomear conversa">
+                                <i class="fas fa-edit"></i>
+                            </span>
+                            <span class="chat-item-action delete-chat" title="Excluir conversa">
+                                <i class="fas fa-trash"></i>
+                            </span>
+                        </div>
+                    `;
+
+            // Evento para selecionar a conversa
+            chatItem.addEventListener("click", function (e) {
+              // Verificar se clicou em um dos botões de ação
+              if (
+                e.target.closest(".rename-chat") ||
+                e.target.closest(".delete-chat")
+              ) {
+                return;
+              }
+
+              // Salvar conversa atual antes de mudar
+              if (conversaAtual) {
+                salvarConversaAtual();
+              }
+
+              // Mudar para a conversa clicada
+              conversaAtual = conversa;
+
+              // Limpar chat atual
+              chatMessages.innerHTML = "";
+
+              // Carregar mensagens da conversa selecionada
+              conversa.mensagens.forEach((msg) => {
+                addMessage(msg.tipo, msg.conteudo);
+              });
+
+              // Atualizar sidebar
+              atualizarHistoricoConversas();
+
+              // Fechar sidebar no mobile
+              sidebar.classList.remove("open");
+              sidebarOverlay.classList.remove("active");
+            });
+
+            // Adicionar evento para renomear conversa
+            const renameBtn = chatItem.querySelector(".rename-chat");
+            renameBtn.addEventListener("click", function (e) {
+              e.stopPropagation();
+              conversaParaRenomear = conversa;
+              conversaTituloInput.value = conversa.titulo;
+              renameModal.style.display = "flex";
+            });
+
+            // Adicionar evento para excluir conversa
+            const deleteBtn = chatItem.querySelector(".delete-chat");
+            deleteBtn.addEventListener("click", function (e) {
+              e.stopPropagation();
+              if (confirm("Tem certeza que deseja excluir esta conversa?")) {
+                // Remover conversa do array
+                const index = conversas.findIndex((c) => c.id === conversa.id);
+                if (index !== -1) {
+                  conversas.splice(index, 1);
+                }
+
+                // Se a conversa excluída for a atual, limpar o chat
+                if (conversaAtual && conversa.id === conversaAtual.id) {
+                  chatMessages.innerHTML = "";
+                  conversaAtual = conversas.length > 0 ? conversas[0] : null;
+
+                  if (conversaAtual) {
+                    // Carregar a primeira conversa disponível
+                    conversaAtual.mensagens.forEach((msg) => {
+                      addMessage(msg.tipo, msg.conteudo);
+                    });
+                  } else {
+                    // Se não houver mais conversas, criar uma nova
+                    conversaAtual = {
+                      id: Date.now(),
+                      titulo: "Nova conversa",
+                      mensagens: [],
+                    };
+                    conversas.push(conversaAtual);
+                    iniciarChat();
+                  }
+                }
+
+                // Atualizar sidebar
+                atualizarHistoricoConversas();
+              }
+            });
+
+            chatHistory.appendChild(chatItem);
+          });
+        }
+
+        // Eventos do modal de renomear
+        closeRenameModal.addEventListener("click", function () {
+          renameModal.style.display = "none";
+        });
+
+        cancelRename.addEventListener("click", function () {
+          renameModal.style.display = "none";
+        });
+
+        confirmRename.addEventListener("click", function () {
+          if (conversaParaRenomear && conversaTituloInput.value.trim() !== "") {
+            conversaParaRenomear.titulo = conversaTituloInput.value.trim();
+            conversaParaRenomear.tituloPersonalizado = true;
+            atualizarHistoricoConversas();
+            renameModal.style.display = "none";
+          }
+        });
+
+        // Fechar modal ao clicar fora dele
+        renameModal.addEventListener("click", function (e) {
+          if (e.target === renameModal) {
+            renameModal.style.display = "none";
+          }
+        });
+
+        // Auto-resize textarea
+        userInput.addEventListener("input", function () {
+          this.style.height = "auto";
+          this.style.height = this.scrollHeight + "px";
+
+          // Habilitar/desabilitar botão de envio
+          sendButton.disabled = this.value.trim() === "";
+        });
+
+        // Enviar mensagem com Enter (Shift+Enter para nova linha)
+        userInput.addEventListener("keydown", function (e) {
+          if (e.key === "Enter" && !e.shiftKey) {
+            e.preventDefault();
+            if (this.value.trim() !== "") {
+              sendMessage();
+            }
+          }
+        });
+
+        // Botão de enviar
+        sendButton.addEventListener("click", function () {
+          if (userInput.value.trim() !== "") {
+            sendMessage();
+          }
+        });
+
+        // Botão de opções adicionais
+        micButton.addEventListener("click", function () {
+          alert("Funcionalidades adicionais em desenvolvimento.");
+        });
+
+        // Função para iniciar o chat
+        function iniciarChat() {
+          // Se não temos uma conversa atual, criar uma
+          if (!conversaAtual) {
+            conversaAtual = {
+              id: Date.now(),
+              titulo: "Nova conversa",
+              mensagens: [],
+            };
+            conversas.push(conversaAtual);
+            atualizarHistoricoConversas();
+          }
+
+          // Adicionar mensagem de boas-vindas com efeito de digitação
+          addMessageWithTypingEffect(
+            "assistant",
+            "Olá! Sou o Dr. Alberts, CAIO PHd, psiquiatra. Para iniciarmos nossa consulta, poderia me informar seu nome completo?"
           );
         }
-      }
+
+        // Função para enviar mensagem
+        async function sendMessage() {
+          const userMessage = userInput.value.trim();
+
+          // Adicionar mensagem do usuário
+          addMessage("user", userMessage);
+
+          // Limpar input e resetar altura
+          userInput.value = "";
+          userInput.style.height = "auto";
+          sendButton.disabled = true;
+
+          // Verificar se estamos coletando dados iniciais
+          if (esperandoNome) {
+            dadosPaciente.nome = userMessage;
+            esperandoNome = false;
+            esperandoIdade = true;
+            setTimeout(() => {
+              addMessageWithTypingEffect(
+                "assistant",
+                `Obrigado, ${dadosPaciente.nome}. Agora, poderia me informar sua idade?`
+              );
+            }, 500);
+
+            // Atualizar título da conversa
+            conversaAtual.titulo = dadosPaciente.nome;
+            atualizarHistoricoConversas();
+            return;
+          }
+
+          if (esperandoIdade) {
+            const idade = parseInt(userMessage);
+            if (isNaN(idade) || idade < 1 || idade > 120) {
+              setTimeout(() => {
+                addMessageWithTypingEffect(
+                  "assistant",
+                  "Por favor, informe sua idade em números (entre 1 e 120 anos)."
+                );
+              }, 500);
+              return;
+            }
+
+            dadosPaciente.idade = idade;
+            esperandoIdade = false;
+
+            // Mostrar indicador de carregamento
+            showLoading();
+
+            try {
+              // Iniciar consulta com os dados coletados
+              await iniciarConsulta();
+            } catch (error) {
+              console.error("Erro ao iniciar consulta:", error);
+              hideLoading();
+              addMessageWithTypingEffect(
+                "assistant",
+                "Desculpe, ocorreu um erro ao iniciar a consulta. Por favor, tente novamente."
+              );
+            }
+
+            return;
+          }
+
+          // Mostrar indicador de carregamento
+          showLoading();
+
+          try {
+            // Enviar mensagem para a API
+            if (sessaoId) {
+              const response = await fetch(`${API_URL}/api/conversar`, {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                  sessaoId: sessaoId,
+                  mensagem: userMessage,
+                }),
+              });
+
+              if (!response.ok) {
+                throw new Error(`Erro na resposta: ${response.status}`);
+              }
+
+              const data = await response.json();
+              hideLoading();
+
+              if (data.resposta) {
+                addMessageWithTypingEffect("assistant", data.resposta);
+                if (data.fase) {
+                  faseConsulta = data.fase;
+                  atualizarFaseConsulta(faseConsulta);
+                }
+              } else {
+                addMessageWithTypingEffect(
+                  "assistant",
+                  data.erro ||
+                    "Desculpe, não consegui processar sua mensagem. Poderia tentar novamente?"
+                );
+              }
+            } else {
+              hideLoading();
+              addMessageWithTypingEffect(
+                "assistant",
+                "Desculpe, parece que perdemos a conexão. Vamos reiniciar a consulta."
+              );
+              // Reiniciar o processo
+              esperandoNome = true;
+              esperandoIdade = false;
+              iniciarChat();
+            }
+          } catch (error) {
+            console.error("Erro ao enviar mensagem:", error);
+            hideLoading();
+            addMessageWithTypingEffect(
+              "assistant",
+              "Desculpe, ocorreu um erro de conexão. Por favor, verifique sua internet e tente novamente."
+            );
+          }
+        }
+
+        // Função para iniciar a consulta
+        async function iniciarConsulta() {
+          try {
+            const response = await fetch(`${API_URL}/api/iniciar-sessao`, {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify(dadosPaciente),
+            });
+
+            if (!response.ok) {
+              throw new Error(`Erro na resposta: ${response.status}`);
+            }
+
+            const data = await response.json();
+            hideLoading();
+
+            if (data.sessaoId) {
+              sessaoId = data.sessaoId;
+              faseConsulta = data.fase || "acolhimento";
+              atualizarFaseConsulta(faseConsulta);
+
+              // Adicionar a primeira mensagem do médico com efeito de digitação
+              addMessageWithTypingEffect("assistant", data.mensagem);
+              consultaIniciada = true;
+
+              // Atualizar título da conversa com nome do paciente
+              conversaAtual.titulo = `Consulta: ${dadosPaciente.nome}`;
+              atualizarHistoricoConversas();
+            } else {
+              addMessageWithTypingEffect(
+                "assistant",
+                data.erro ||
+                  "Desculpe, não foi possível iniciar a consulta. Por favor, tente novamente."
+              );
+            }
+          } catch (error) {
+            console.error("Erro ao iniciar consulta:", error);
+            hideLoading();
+            addMessageWithTypingEffect(
+              "assistant",
+              "Desculpe, ocorreu um erro ao conectar com o Dr. Alexandre. Por favor, verifique sua conexão."
+            );
+            throw error;
+          }
+        }
+
+        // Atualizar a fase da consulta na interface
+        function atualizarFaseConsulta(fase) {
+          let faseTexto = "Consulta em andamento";
+
+          switch (fase) {
+            case "acolhimento":
+              faseTexto = "Acolhimento inicial";
+              break;
+            case "anamnese":
+              faseTexto = "Anamnese";
+              break;
+            case "exame_mental":
+              faseTexto = "Exame mental";
+              break;
+            case "diagnostico":
+              faseTexto = "Diagnóstico";
+              break;
+            case "tratamento":
+              faseTexto = "Plano terapêutico";
+              break;
+            case "seguimento":
+              faseTexto = "Seguimento";
+              break;
+          }
+
+          faseConsultaElement.textContent = faseTexto;
+        }
+
+        // Adicionar mensagem ao chat (sem efeito de digitação)
+        function addMessage(sender, content) {
+          const messageDiv = document.createElement("div");
+          messageDiv.className = `message ${sender}`;
+
+          const messageContent = document.createElement("div");
+          messageContent.className = "message-content";
+          messageContent.textContent = content;
+
+          messageDiv.appendChild(messageContent);
+          chatMessages.appendChild(messageDiv);
+
+          // Scroll para a mensagem mais recente
+          chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        // Adicionar mensagem com efeito de digitação rápido
+        function addMessageWithTypingEffect(sender, content) {
+          const messageDiv = document.createElement("div");
+          messageDiv.className = `message ${sender}`;
+
+          const messageContent = document.createElement("div");
+          messageContent.className = "message-content";
+
+          // Adicionar cursor de digitação
+          const cursor = document.createElement("span");
+          cursor.className = "typing-cursor";
+
+          messageDiv.appendChild(messageContent);
+          messageContent.appendChild(cursor);
+          chatMessages.appendChild(messageDiv);
+
+          // Scroll para a mensagem mais recente
+          chatMessages.scrollTop = chatMessages.scrollHeight;
+
+          // Configurações do efeito de digitação rápida
+          const minChunkSize = 3;
+          const maxChunkSize = 10;
+          const baseSpeed = 15;
+          const speedVariation = 30;
+
+          let currentPosition = 0;
+
+          function typeNextChunk() {
+            if (currentPosition < content.length) {
+              // Remover o cursor para adicionar o próximo bloco
+              if (messageContent.contains(cursor)) {
+                messageContent.removeChild(cursor);
+              }
+
+              // Determinar o tamanho do próximo bloco
+              const chunkSize =
+                Math.floor(Math.random() * (maxChunkSize - minChunkSize + 1)) +
+                minChunkSize;
+              const endPosition = Math.min(
+                currentPosition + chunkSize,
+                content.length
+              );
+              const nextChunk = content.substring(currentPosition, endPosition);
+
+              // Processar o bloco
+              for (let i = 0; i < nextChunk.length; i++) {
+                if (nextChunk[i] === "\n") {
+                  messageContent.appendChild(document.createElement("br"));
+                } else {
+                  messageContent.appendChild(
+                    document.createTextNode(nextChunk[i])
+                  );
+                }
+              }
+
+              // Adicionar o cursor novamente
+              messageContent.appendChild(cursor);
+              currentPosition = endPosition;
+
+              // Scroll para acompanhar a digitação
+              chatMessages.scrollTop = chatMessages.scrollHeight;
+
+              // Calcular a velocidade para o próximo bloco
+              const speed =
+                baseSpeed + Math.floor(Math.random() * speedVariation);
+              setTimeout(typeNextChunk, speed);
+            } else {
+              // Remover o cursor quando terminar de digitar
+              if (messageContent.contains(cursor)) {
+                messageContent.removeChild(cursor);
+              }
+
+              // Salvar a conversa após cada mensagem do assistente
+              if (sender === "assistant" && conversaAtual) {
+                salvarConversaAtual();
+                atualizarHistoricoConversas();
+              }
+            }
+          }
+
+          // Iniciar efeito de digitação
+          setTimeout(typeNextChunk, baseSpeed);
+        }
+
+        // Mostrar indicador de carregamento
+        function showLoading() {
+          const loadingDiv = document.createElement("div");
+          loadingDiv.className = "loading-dots";
+          loadingDiv.id = "loadingIndicator";
+
+          for (let i = 0; i < 3; i++) {
+            const dot = document.createElement("div");
+            dot.className = "dot";
+            loadingDiv.appendChild(dot);
+          }
+
+          chatMessages.appendChild(loadingDiv);
+          chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        // Esconder indicador de carregamento
+        function hideLoading() {
+          const loadingIndicator = document.getElementById("loadingIndicator");
+          if (loadingIndicator) {
+            loadingIndicator.remove();
+          }
+        }
+
+        // Adicionar algumas conversas de exemplo para demonstração
+        function adicionarConversasExemplo() {
+          const conversa1 = {
+            id: Date.now() - 86400000,
+            titulo: "Consulta inicial",
+            mensagens: [
+              { tipo: "assistant", conteudo: "Olá! Como posso ajudar hoje?" },
+              {
+                tipo: "user",
+                conteudo: "Tenho sentido muita ansiedade ultimamente",
+              },
+              {
+                tipo: "assistant",
+                conteudo:
+                  "Entendo. Há quanto tempo você tem sentido essa ansiedade?",
+              },
+            ],
+          };
+
+          const conversa2 = {
+            id: Date.now() - 172800000,
+            titulo: "Acompanhamento",
+            mensagens: [
+              {
+                tipo: "assistant",
+                conteudo:
+                  "Olá novamente! Como tem se sentido desde nossa última consulta?",
+              },
+              {
+                tipo: "user",
+                conteudo:
+                  "Um pouco melhor, mas ainda com dificuldades para dormir",
+              },
+              {
+                tipo: "assistant",
+                conteudo:
+                  "Vamos falar sobre suas rotinas de sono e possíveis técnicas para melhorar isso.",
+              },
+            ],
+          };
+
+          conversas.push(conversa1, conversa2);
+          atualizarHistoricoConversas();
+        }
+
+        // Adicionar conversas de exemplo apenas se não estiver em produção
+        if (
+          window.location.hostname === "localhost" ||
+          window.location.hostname === "127.0.0.1"
+        ) {
+          adicionarConversasExemplo();
+        }
+      });
     </script>
   </body>
 </html>

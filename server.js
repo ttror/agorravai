@@ -1,574 +1,653 @@
-const express = require('express');
-const cors = require('cors');
-const axios = require('axios');
-const path = require('path');
+const express = require("express");
+const cors = require("cors");
+const axios = require("axios");
+const path = require("path");
 
 const app = express();
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT || 3002;
 
 // Configuração básica
-app.use(express.json());
+app.use(express.json({ limit: "50mb" }));
+app.use(express.urlencoded({ limit: "50mb", extended: true }));
 app.use(cors());
-app.use(express.static('public'));
+app.use(express.static("public"));
 
-// Configuração da IA Claude - OBRIGATÓRIA
-const CLAUDE_API_KEY = process.env.ANTHROPIC_API_KEY || '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';
-const CLAUDE_API_URL = 'https://api.anthropic.com/v1/messages';
+// Configuração da IA Claude
+const CLAUDE_API_KEY =
+  process.env.ANTHROPIC_API_KEY ||
+  "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";
+const CLAUDE_API_URL = "https://api.anthropic.com/v1/messages";
+const CLAUDE_MODEL = process.env.CLAUDE_MODEL || "claude-opus-4-1-20250805"; // 👈 modelo atualizado
 
 // Verificar se API está configurada
-if (!CLAUDE_API_KEY || CLAUDE_API_KEY === 'undefined') {
-  console.error('❌ ERRO: ANTHROPIC_API_KEY não configurada!');
+if (!CLAUDE_API_KEY || CLAUDE_API_KEY === "undefined") {
+  console.error("❌ ERRO: ANTHROPIC_API_KEY não configurada!");
   process.exit(1);
 }
+
+const {
+  initReferenciasAPI,
+  searchReferencias,
+  formatAPA,
+} = require("./referencias.bundle");
+
+// Registre as rotas (opcional: mude o caminho base)
+initReferenciasAPI(app, { basePath: "/api/referencias" });
+
+// server.js
+const {
+  initGenericosAPI,
+  searchGenericos,
+  formatResumo,
+} = require("./genericos.bundle");
+
+// Registra as rotas em /api/genericos (pode alterar o basePath se quiser)
+initGenericosAPI(app, { basePath: "/api/genericos" });
+
+// server.js
+const { initPsicoGenericosAPI } = require("./psiq_genericos.bundle");
+
+// … depois do app.use(express.json()) etc.
+initPsicoGenericosAPI(app, { basePath: "/api/psiq" });
+// opcional: troque o basePath se quiser: "/api/psiquiatria"
 
 // Armazenamento de sessões
 const sessoes = new Map();
 
-// Base de conhecimento médico psiquiátrico
-const MEDICAMENTOS_PSIQUIATRICOS = {
-  antidepressivos: {
-    isrs: [
-      { nome: "Fluoxetina", dosagem: "20-80mg/dia", indicacoes: ["Depressão", "TAG", "TOC", "Bulimia"], efeitos: "Ativação inicial, insônia, disfunção sexual" },
-      { nome: "Sertralina", dosagem: "50-200mg/dia", indicacoes: ["Depressão", "TAG", "Pânico", "TEPT"], efeitos: "Náusea, diarreia, sonolência" },
-      { nome: "Escitalopram", dosagem: "10-20mg/dia", indicacoes: ["Depressão", "TAG"], efeitos: "Sonolência, boca seca, sudorese" },
-      { nome: "Paroxetina", dosagem: "20-60mg/dia", indicacoes: ["Depressão", "Pânico", "Fobia Social"], efeitos: "Sedação, ganho de peso, síndrome de descontinuação" }
-    ],
-    irsn: [
-      { nome: "Venlafaxina", dosagem: "75-375mg/dia", indicacoes: ["Depressão", "TAG", "Fibromialgia"], efeitos: "Hipertensão, náusea, tontura" },
-      { nome: "Duloxetina", dosagem: "60-120mg/dia", indicacoes: ["Depressão", "TAG", "Dor neuropática"], efeitos: "Náusea, boca seca, constipação" }
-    ],
-    outros: [
-      { nome: "Bupropiona", dosagem: "150-450mg/dia", indicacoes: ["Depressão", "Cessação tabágica"], efeitos: "Ativação, insônia, boca seca, sem disfunção sexual" },
-      { nome: "Mirtazapina", dosagem: "15-45mg/dia", indicacoes: ["Depressão", "Insônia", "Perda de apetite"], efeitos: "Sedação, ganho de peso, aumento do apetite" }
-    ]
-  },
-  ansioliticos: [
-    { nome: "Clonazepam", dosagem: "0,5-4mg/dia", indicacoes: ["Pânico", "TAG", "Convulsões"], duracao: "Uso de curto prazo", efeitos: "Sedação, dependência" },
-    { nome: "Alprazolam", dosagem: "0,25-4mg/dia", indicacoes: ["Pânico", "TAG"], duracao: "Uso de curto prazo", efeitos: "Sedação, dependência, síndrome de abstinência" },
-    { nome: "Lorazepam", dosagem: "1-6mg/dia", indicacoes: ["Ansiedade", "Insônia"], duracao: "Uso de curto prazo", efeitos: "Sedação, amnésia anterógrada" }
-  ],
-  antipsicoticos: [
-    { nome: "Risperidona", dosagem: "2-8mg/dia", indicacoes: ["Esquizofrenia", "Transtorno Bipolar", "Irritabilidade no Autismo"], efeitos: "Sintomas extrapiramidais, hiperprolactinemia" },
-    { nome: "Quetiapina", dosagem: "25-800mg/dia", indicacoes: ["Esquizofrenia", "Bipolar", "Depressão (adjuvante)"], efeitos: "Sedação, ganho de peso, síndrome metabólica" },
-    { nome: "Aripiprazol", dosagem: "10-30mg/dia", indicacoes: ["Esquizofrenia", "Bipolar", "Depressão (adjuvante)"], efeitos: "Acatisia, náusea, insônia" }
-  ],
-  estabilizadores: [
-    { nome: "Lítio", dosagem: "600-1200mg/dia", indicacoes: ["Transtorno Bipolar", "Prevenção de suicídio"], monitoramento: "Litemia, função renal e tireoidiana" },
-    { nome: "Ácido Valproico", dosagem: "500-2000mg/dia", indicacoes: ["Bipolar", "Epilepsia"], monitoramento: "Função hepática, hemograma" },
-    { nome: "Lamotrigina", dosagem: "25-400mg/dia", indicacoes: ["Bipolar (manutenção)", "Epilepsia"], efeitos: "Rash cutâneo (síndrome de Stevens-Johnson)" }
-  ]
-};
+// CONTEXTO ATUALIZADO COM ABORDAGEM FENOMENOLÓGICA PARA PSIQUIATRAS
+const CONTEXTO_PSIQUIATRA_BASE = `Você é o Dr. CAIO, PHd, psiquiatra sênior com 15 anos de experiência, especialista em Psicopatologia Fenomenológica e Psicofarmacologia. Você conversa com OUTRO PSIQUIATRA usando uma abordagem fenomenológica-descritiva.
 
-// Contexto médico psiquiátrico realista
-const CONTEXTO_PSIQUIATRA = `Você é Dr. Alexandre Santos, psiquiatra com CRM-SP 123456, formado pela FMUSP, com 15 anos de experiência clínica e especialização em Psicofarmacologia pela ABP.
+PERFIL E ABORDAGEM:
+- Formação em fenomenologia psiquiátrica (Jaspers, Minkowski, Binswanger)
+- Valoriza a descrição detalhada das vivências e experiências subjetivas
+- Integra psicopatologia descritiva com evidências científicas
+- Prefere compreender antes de classificar
+- Experiência em psicopatologia fundamental e análise existencial
 
-PERFIL PROFISSIONAL:
-- Atendimento humanizado e baseado em evidências científicas
-- Experiência em transtornos de humor, ansiedade, psicoses e dependências
-- Abordagem integrativa: avaliação completa + farmacoterapia + psicoterapia
-- Seguimento rigoroso de protocolos médicos e diretrizes da ABP/APA
+ESTILO DE COMUNICAÇÃO ENTRE COLEGAS:
+- Use linguagem descritiva rica e precisa sobre fenômenos mentais
+- Evite jargão técnico excessivo - prefira descrições fenomenológicas
+- Explore as vivências, temporalidade e espacialidade dos pacientes
+- Discuta a estrutura da experiência antes dos diagnósticos
+- Seja direto mas contemple a complexidade da experiência humana
+- Balance fenomenologia com pragmatismo clínico
 
-ESTRUTURA DE CONSULTA REAL:
-1. ACOLHIMENTO: Estabelecer rapport, explicar confidencialidade médica
-2. ANAMNESE DETALHADA: História atual, antecedentes, história familiar, social
-3. EXAME MENTAL: Aparência, humor, afeto, pensamento, percepção, cognição
-4. DIAGNÓSTICO DIFERENCIAL: Baseado em critérios DSM-5-TR/CID-11
-5. PLANO TERAPÊUTICO COMPLETO: Medicação + psicoterapia + seguimento
+ABORDAGEM FENOMENOLÓGICA:
+- Descreva como o paciente vivencia seus sintomas
+- Explore alterações na consciência do tempo e espaço
+- Analise mudanças na corporeidade e intersubjetividade
+- Considere a biografia e contexto existencial
+- Use conceitos como: vivência, mundo-da-vida, intencionalidade, temporalidade vivida
+- Evite reducionismos biológicos ou psicológicos
 
-DIAGNÓSTICO E PRESCRIÇÃO:
-- Sempre fornecer hipóteses diagnósticas baseadas nos sintomas apresentados
-- Explicar o raciocínio clínico por trás do diagnóstico
-- Quando indicar medicação: nome, dosagem, horário, duração
-- Explicar mecanismo de ação, efeitos esperados e possíveis efeitos adversos
-- Orientar sobre tempo de resposta (2-6 semanas para antidepressivos)
-- Agendar retorno em 15-30 dias para reavaliação e ajustes
-- Solicitar exames complementares quando necessário
+INSTRUÇÕES PRÁTICAS:
+1. Quando discutir casos, comece pela descrição fenomenológica
+2. Use termos técnicos apenas quando agregarem precisão descritiva
+3. Seja extenso quando a complexidade do fenômeno exigir
+4. Seja direto e conciso em questões práticas de manejo
+5. Integre a compreensão fenomenológica com decisões terapêuticas
+6. Mantenha tom colegial, como numa supervisão fenomenológica
+7. Discuta de maneira por menorizada baseado nas evidencias cientificas atuais um manejo psicofarmacologico
+8. Estamos no Brasil relate todas as possibilidades medicamentosa de tratamento inclusive as nao indicadas para o caso em especifico por quaisquer motivo e explique
+9. Seja acertivo e consiso, sem perde a rubustez tecnica`;
 
-COMUNICAÇÃO MÉDICA NATURAL:
-- Use linguagem médica profissional mas acessível ao paciente
-- Demonstre empatia genuína mantendo postura científica
-- Faça perguntas direcionadas para diagnóstico diferencial
-- Eduque o paciente sobre sua condição de forma clara
-- NUNCA use asteriscos ou descrições de gestos/ações físicas
-- Mantenha o foco na conversa verbal natural e fluida
+// Classe para categorizar perguntas - ADAPTADA PARA FENOMENOLOGIA
+class CategorizadorPerguntas {
+  constructor() {
+    this.padroes = {
+      fenomenologia: [
+        /fenômeno|vivência|experiência|descrição/i,
+        /temporalidade|espacialidade|corporeidade/i,
+        /mundo.?da.?vida|lebenswelt|dasein/i,
+        /estrutura.*experiência|análise.*existencial/i,
+        /jaspers|minkowski|binswanger|merleau.?ponty/i,
+      ],
+      psicopatologia_descritiva: [
+        /como.*paciente.*vive|experimenta|sente/i,
+        /descrição.*detalhada|fenomenológica/i,
+        /alteração.*consciência|self|eu/i,
+        /mudança.*percepção|vivência.*tempo/i,
+      ],
+      casos_fenomenologicos: [
+        /caso.*interessante|peculiar|fenomenologicamente/i,
+        /apresentação.*atípica|incomum/i,
+        /fenômeno.*raro|singular/i,
+        /estrutura.*delírio|alucinação|humor/i,
+      ],
+      integracao_terapeutica: [
+        /como.*integrar.*fenomenologia.*tratamento/i,
+        /abordagem.*compreensiva.*medicação/i,
+        /psicofarmacologia.*fenomenológica/i,
+        /terapêutica.*existencial/i,
+      ],
+      discussao_teorica: [
+        /conceito|teoria|fundamento/i,
+        /diferença.*fenomenologia.*dsm/i,
+        /crítica.*modelo.*biomédico/i,
+        /psicopatologia.*fundamental/i,
+      ],
+      manejo_pratico: [
+        /dose|medicação|prescrição/i,
+        /conduta|manejo|tratamento/i,
+        /urgência|emergência|crise/i,
+        /prático|objetivo|direto/i,
+      ],
+    };
+  }
 
-PRESCRIÇÃO RESPONSÁVEL:
-- Sempre avaliar indicação, contraindicações e interações
-- Considerar perfil do paciente (idade, comorbidades, outros medicamentos)
-- Orientar sobre adesão ao tratamento e importância do seguimento
-- Em casos de risco: orientar busca imediata de emergência
-- Documentar adequadamente todas as orientações
-
-EXEMPLOS DE DIAGNÓSTICOS COMUNS:
-- Episódio Depressivo Maior (F32.x)
-- Transtorno de Ansiedade Generalizada (F41.1)
-- Transtorno do Pânico (F41.0)
-- Transtorno Bipolar (F31.x)
-- Transtornos relacionados a trauma (F43.x)
-
-Conduza a consulta exatamente como um psiquiatra experiente faria, incluindo diagnósticos e prescrições quando apropriado.`;
-
-// Função para chamar Claude com contexto médico
-async function chamarClaude(mensagem, historico = [], contextoAdicional = '') {
-  try {
-    let contextoCompleto = CONTEXTO_PSIQUIATRA;
-    
-    if (contextoAdicional) {
-      contextoCompleto += `\n\nCONTEXTO ADICIONAL DA CONSULTA:\n${contextoAdicional}`;
+  categorizar(pergunta) {
+    const categorias = [];
+    for (const [categoria, padroes] of Object.entries(this.padroes)) {
+      for (const padrao of padroes) {
+        if (padrao.test(pergunta)) {
+          categorias.push(categoria);
+          break;
+        }
+      }
     }
-    
-    contextoCompleto += "\n\nHISTÓRICO DA CONSULTA:\n";
-    
-    historico.forEach(msg => {
-      if (msg.tipo === 'paciente') {
-        contextoCompleto += `Paciente: ${msg.conteudo}\n`;
+    return categorias.length > 0 ? categorias : ["geral"];
+  }
+}
+
+// Classe para gerenciar interações com Claude
+class GerenciadorClaude {
+  constructor(apiKey, apiUrl) {
+    this.apiKey = apiKey;
+    this.apiUrl = apiUrl;
+    this.categorizador = new CategorizadorPerguntas();
+  }
+
+  async chamarClaude(mensagem, historico = [], contextoAdicional = "") {
+    try {
+      const contextoCompleto = this.construirContexto(
+        mensagem,
+        historico,
+        contextoAdicional
+      );
+
+      const response = await axios.post(
+        this.apiUrl,
+        {
+          model: CLAUDE_MODEL, // 👈 agora usa o modelo atualizado
+          max_tokens: 90000,
+          messages: [
+            {
+              role: "user",
+              content: contextoCompleto,
+            },
+          ],
+        },
+        {
+          headers: {
+            "x-api-key": this.apiKey,
+            "Content-Type": "application/json",
+            "anthropic-version": "2023-06-01",
+          },
+          timeout: 240000,
+        }
+      );
+
+      return response.data.content[0].text.trim();
+    } catch (error) {
+      console.error(
+        "Erro ao chamar Claude:",
+        error.response?.data || error.message
+      );
+      throw new Error("Aguarde um momento, estou processando sua questão...");
+    }
+  }
+
+  construirContexto(mensagem, historico, contextoAdicional) {
+    const categorias = this.categorizador.categorizar(mensagem);
+    let contextoCompleto = CONTEXTO_PSIQUIATRA_BASE;
+
+    if (categorias.includes("fenomenologia")) {
+      contextoCompleto += `\n\nFOCO FENOMENOLÓGICO:
+Priorize a descrição detalhada dos fenômenos mentais. Explore como o paciente vivencia sua condição, as alterações na temporalidade e espacialidade vividas, mudanças na corporeidade e na relação com o mundo.`;
+    }
+
+    if (categorias.includes("psicopatologia_descritiva")) {
+      contextoCompleto += `\n\nABORDAGEM DESCRITIVA:
+Descreva minuciosamente as características do fenômeno psicopatológico. Use linguagem precisa mas evite jargão desnecessário. Contemple a riqueza da experiência antes de categorizar.`;
+    }
+
+    if (categorias.includes("casos_fenomenologicos")) {
+      contextoCompleto += `\n\nDISCUSSÃO DE CASO:
+Analise o caso começando pela descrição fenomenológica detalhada. Explore a estrutura da experiência, o modo de ser-no-mundo do paciente, antes de discutir diagnósticos ou tratamentos.`;
+    }
+
+    if (categorias.includes("manejo_pratico")) {
+      contextoCompleto += `\n\nQUESTÃO PRÁTICA:
+Seja direto e objetivo. Forneça informações práticas claras, mas sempre considerando o contexto fenomenológico quando relevante para o manejo.`;
+    }
+
+    if (contextoAdicional) {
+      contextoCompleto += `\n\nCONTEXTO DA DISCUSSÃO:\n${contextoAdicional}`;
+    }
+
+    contextoCompleto += "\n\nHISTÓRICO DA CONVERSA:\n";
+    historico.forEach((msg) => {
+      if (msg.tipo === "colega") {
+        contextoCompleto += `Colega: ${msg.conteudo}\n`;
       } else {
         contextoCompleto += `Dr. Alexandre: ${msg.conteudo}\n`;
       }
     });
-    
-    contextoCompleto += `\nPaciente: ${mensagem}\n\nDr. Alexandre:`;
 
-    const response = await axios.post(CLAUDE_API_URL, {
-      model: 'claude-opus-4-1-20250805',
-      max_tokens: 800,
-      messages: [{
-        role: 'user',
-        content: contextoCompleto
-      }]
-    }, {
-      headers: {
-        'x-api-key': CLAUDE_API_KEY,
-        'Content-Type': 'application/json',
-        'anthropic-version': '2023-06-01'
-      },
-      timeout: 60000
-    });
-
-    return response.data.content[0].text.trim();
-  } catch (error) {
-    console.error('Erro ao chamar Claude:', error.response?.data || error.message);
-    if (error.code === 'ECONNABORTED') {
-      throw new Error('Tempo limite excedido. O Dr. Alexandre está analisando cuidadosamente sua situação.');
-    }
-    throw new Error('Dr. Alexandre está processando sua consulta. Aguarde um momento.');
+    contextoCompleto += `\nColega: ${mensagem}\n\nDr. Alexandre:`;
+    return contextoCompleto;
   }
 }
 
-// Rota principal
-app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'index.html'));
-});
-
-// Iniciar consulta psiquiátrica
-app.post('/api/consulta/iniciar', async (req, res) => {
-  try {
-    const { nome, idade, genero, motivoConsulta, historicoPsiquiatrico, medicamentosAtuais } = req.body;
-    
-    if (!nome || !idade) {
-      return res.status(400).json({ error: 'Nome e idade são obrigatórios' });
-    }
-
-    const sessaoId = Date.now().toString();
+// Gerenciadores
+const gerenciadorSessao = new (class {
+  constructor() {
+    this.sessoes = new Map();
+    this.limpezaAutomatica();
+  }
+  criarSessao(dadosColega) {
+    const sessaoId =
+      Date.now().toString() + Math.random().toString(36).substr(2, 9);
     const sessao = {
       id: sessaoId,
-      paciente: {
-        nome,
-        idade,
-        genero: genero || 'não informado',
-        motivoConsulta: motivoConsulta || '',
-        historicoPsiquiatrico: historicoPsiquiatrico || 'negativo',
-        medicamentosAtuais: medicamentosAtuais || 'nenhum'
-      },
-      fase: 'acolhimento',
+      colega: dadosColega,
+      tipo: "discussao_clinica",
       historico: [],
-      dadosColetados: {},
-      iniciada: new Date()
+      topicos_discutidos: [],
+      iniciada: new Date(),
+      ultimaAtividade: new Date(),
+      status: "ativa",
     };
-
-    sessoes.set(sessaoId, sessao);
-
-    // Contexto inicial da consulta
-    const contextoInicial = `
-DADOS INICIAIS DO PACIENTE:
-- Nome: ${nome}
-- Idade: ${idade} anos
-- Gênero: ${genero || 'não informado'}
-- Motivo da consulta: ${motivoConsulta || 'não especificado inicialmente'}
-- Histórico psiquiátrico: ${historicoPsiquiatrico || 'a investigar'}
-- Medicamentos atuais: ${medicamentosAtuais || 'nenhum'}
-
-FASE: Acolhimento inicial - estabelecer rapport e começar anamnese detalhada.
-
-ORIENTAÇÕES ESPECÍFICAS PARA ESTA CONSULTA:
-- Conduza uma anamnese psiquiátrica completa e estruturada
-- Investigue sintomas atuais, duração, intensidade e impacto funcional
-- Explore fatores desencadeantes e história familiar
-- Realize exame mental através da observação da conversa
-- Ao final da consulta, forneça hipóteses diagnósticas baseadas em critérios DSM-5-TR
-- Se indicado, prescreva medicação com orientações completas
-- Sempre eduque o paciente sobre sua condição e tratamento
-- Agende seguimento apropriado (15-30 dias)
-- Mantenha linguagem natural, sem asteriscos ou descrições de gestos
-`;
-
-    const mensagemInicial = `Olá Dr. Alexandre, meu nome é ${nome}, tenho ${idade} anos. ${motivoConsulta ? `Estou aqui porque ${motivoConsulta}.` : 'Gostaria de conversar sobre algumas questões que têm me incomodado.'}`;
-    
-    const resposta = await chamarClaude(mensagemInicial, [], contextoInicial);
-
-    // Adicionar ao histórico
-    sessao.historico.push({
-      tipo: 'paciente',
-      conteudo: mensagemInicial,
-      timestamp: new Date()
-    });
-
-    sessao.historico.push({
-      tipo: 'medico',
-      conteudo: resposta,
-      timestamp: new Date()
-    });
-
-    sessoes.set(sessaoId, sessao);
-
-    res.json({
-      success: true,
-      sessaoId,
-      resposta: resposta,
-      medico: 'Dr. Alexandre Santos',
-      crm: 'CRM-SP 123456',
-      fase: 'acolhimento'
-    });
-
-  } catch (error) {
-    console.error('Erro ao iniciar consulta:', error);
-    res.status(500).json({ 
-      success: false,
-      message: error.message || 'Erro ao conectar com Dr. Alexandre. Verifique sua conexão.' 
-    });
+    this.sessoes.set(sessaoId, sessao);
+    return sessao;
   }
-});
+  obterSessao(id) {
+    const sessao = this.sessoes.get(id);
+    if (sessao) sessao.ultimaAtividade = new Date();
+    return sessao;
+  }
+  atualizarSessao(id, dados) {
+    const sessao = this.sessoes.get(id);
+    if (sessao) {
+      Object.assign(sessao, dados);
+      sessao.ultimaAtividade = new Date();
+      this.sessoes.set(id, sessao);
+    }
+    return sessao;
+  }
+  adicionarMensagem(id, tipo, conteudo) {
+    const sessao = this.obterSessao(id);
+    if (sessao)
+      sessao.historico.push({ tipo, conteudo, timestamp: new Date() });
+  }
+  limpezaAutomatica() {
+    setInterval(() => {
+      const agora = new Date();
+      for (const [id, sessao] of this.sessoes) {
+        if (agora - sessao.ultimaAtividade > 4 * 60 * 60 * 1000) {
+          this.sessoes.delete(id);
+        }
+      }
+    }, 60 * 60 * 1000);
+  }
+})();
 
-// Rota para conversar durante a consulta
-app.post('/api/consulta/conversar', async (req, res) => {
+// Instanciar gerenciadores
+
+const gerenciadorClaude = new GerenciadorClaude(CLAUDE_API_KEY, CLAUDE_API_URL);
+
+// Rota para iniciar nova sessão
+app.post("/api/iniciar-sessao", (req, res) => {
   try {
-    const { mensagem, fase, dadosPaciente } = req.body;
-    
-    if (!mensagem) {
-      return res.status(400).json({ 
-        success: false,
-        message: 'Mensagem é obrigatória' 
+    const { nome, especialidade, instituicao, topico } = req.body;
+
+    if (!nome) {
+      return res.status(400).json({
+        erro: "Nome é obrigatório",
       });
     }
 
-    // Contexto baseado na fase atual
-    let contextoFase = `
-DADOS DO PACIENTE:
-- Nome: ${dadosPaciente.nome}
-- Idade: ${dadosPaciente.idade} anos
-- Gênero: ${dadosPaciente.genero || 'não informado'}
-- Motivo da consulta: ${dadosPaciente.motivo || 'não especificado'}
-- Medicamentos atuais: ${dadosPaciente.medicamentos || 'nenhum'}
+    const dadosColega = { nome, especialidade, instituicao, topico };
+    const sessao = gerenciadorSessao.criarSessao(dadosColega);
 
-FASE ATUAL: ${fase}
-
-ORIENTAÇÕES ESPECÍFICAS:
-- Conduza uma consulta psiquiátrica profissional e empática
-- Faça perguntas relevantes para a fase atual
-- NUNCA use asteriscos ou descrições de gestos
-- Mantenha linguagem médica natural e acolhedora
-- Ao final da consulta, forneça diagnóstico e prescrição se indicado
-`;
-
-    const resposta = await chamarClaude(mensagem, [], contextoFase);
+    console.log(`✅ Nova discussão iniciada: ${sessao.id} com Dr(a). ${nome}`);
 
     res.json({
-      success: true,
-      resposta: resposta,
-      fase: fase,
-      timestamp: new Date()
+      sessaoId: sessao.id,
+      mensagem: `Olá, Dr(a). ${nome}! Alexandre aqui. ${
+        topico ? `Vi que você quer discutir sobre ${topico}.` : ""
+      } Como posso ajudar? Conte-me sobre o caso ou questão que gostaria de discutir.`,
+      tipo: sessao.tipo,
     });
-
   } catch (error) {
-    console.error('Erro ao processar conversa:', error);
-    res.status(500).json({ 
-      success: false,
-      message: error.message || 'Dr. Alexandre está temporariamente indisponível. Tente novamente.' 
+    console.error("Erro ao iniciar sessão:", error);
+    res.status(500).json({
+      erro: "Erro interno do servidor",
     });
   }
 });
 
-// Continuar consulta (rota antiga)
-app.post('/api/consulta/mensagem', async (req, res) => {
+// Rota principal para conversa
+app.post("/api/conversar", async (req, res) => {
   try {
     const { sessaoId, mensagem } = req.body;
-    
+
     if (!sessaoId || !mensagem) {
-      return res.status(400).json({ error: 'Sessão e mensagem são obrigatórios' });
-    }
-
-    const sessao = sessoes.get(sessaoId);
-    if (!sessao) {
-      return res.status(404).json({ error: 'Sessão não encontrada' });
-    }
-
-    // Adicionar mensagem do paciente
-    sessao.historico.push({
-      tipo: 'paciente',
-      conteudo: mensagem,
-      timestamp: new Date()
-    });
-
-    // Determinar contexto baseado na fase da consulta
-    let contextoFase = `
-DADOS DO PACIENTE:
-- Nome: ${sessao.paciente.nome}
-- Idade: ${sessao.paciente.idade} anos
-- Gênero: ${sessao.paciente.genero}
-- Fase atual: ${sessao.fase}
-
-ORIENTAÇÕES PARA ESTA FASE:
-`;
-
-    switch (sessao.fase) {
-      case 'acolhimento':
-        contextoFase += `
-- Estabelecer rapport e confiança terapêutica
-- Investigar motivo principal da consulta em detalhes
-- Começar anamnese (história da doença atual)
-- Perguntar sobre sintomas específicos, duração e intensidade
-- Investigar impacto funcional (trabalho, relacionamentos, sono)
-- Transicionar para 'anamnese' quando tiver informações suficientes sobre o quadro atual
-- NUNCA use asteriscos ou descrições de gestos
-`;
-        break;
-      case 'anamnese':
-        contextoFase += `
-- Investigar história familiar de transtornos mentais
-- Antecedentes pessoais (médicos, cirúrgicos, psiquiátricos)
-- História de uso de substâncias (álcool, drogas, tabaco)
-- Medicamentos atuais e anteriores (eficácia, efeitos adversos)
-- Fatores psicossociais e estressores
-- Transicionar para 'exame_mental' quando tiver histórico completo
-- NUNCA use asteriscos ou descrições de gestos
-`;
-        break;
-      case 'exame_mental':
-        contextoFase += `
-- Avaliar aparência, comportamento e atitude
-- Investigar humor, afeto e pensamento através da conversa
-- Avaliar percepção (alucinações, ilusões)
-- Testar cognição básica se necessário
-- Avaliar insight e julgamento
-- Transicionar para 'diagnostico' quando exame estiver completo
-- NUNCA use asteriscos ou descrições de gestos
-`;
-        break;
-      case 'diagnostico':
-        contextoFase += `
-- Formular hipóteses diagnósticas baseadas em critérios DSM-5-TR
-- Explicar o raciocínio clínico ao paciente
-- Discutir diagnóstico diferencial se relevante
-- Educar sobre a condição identificada
-- Transicionar para 'tratamento' para discutir opções terapêuticas
-- NUNCA use asteriscos ou descrições de gestos
-`;
-        break;
-      case 'tratamento':
-        contextoFase += `
-- Discutir opções de tratamento (farmacológico e não-farmacológico)
-- Se indicar medicação: nome, dosagem, horário, duração
-- Explicar mecanismo de ação e efeitos esperados
-- Orientar sobre possíveis efeitos adversos
-- Discutir importância da adesão ao tratamento
-- Agendar retorno em 15-30 dias
-- Fornecer orientações de seguimento
-- NUNCA use asteriscos ou descrições de gestos
-`;
-        break;
-      default:
-        contextoFase += `
-- Continue a consulta de forma natural e profissional
-- Mantenha foco nos objetivos terapêuticos
-- NUNCA use asteriscos ou descrições de gestos
-`;
-    }
-
-    const resposta = await chamarClaude(mensagem, sessao.historico.slice(0, -1), contextoFase);
-
-    // Adicionar resposta do médico
-    sessao.historico.push({
-      tipo: 'medico',
-      conteudo: resposta,
-      timestamp: new Date()
-    });
-
-    // Atualizar fase se necessário (lógica baseada no progresso da consulta)
-    const numMensagens = sessao.historico.filter(h => h.tipo === 'medico').length;
-    if (numMensagens >= 3 && sessao.fase === 'acolhimento') {
-      sessao.fase = 'anamnese';
-    } else if (numMensagens >= 6 && sessao.fase === 'anamnese') {
-      sessao.fase = 'exame_mental';
-    } else if (numMensagens >= 8 && sessao.fase === 'exame_mental') {
-      sessao.fase = 'diagnostico';
-    } else if (numMensagens >= 10 && sessao.fase === 'diagnostico') {
-      sessao.fase = 'tratamento';
-    }
-
-    sessoes.set(sessaoId, sessao);
-
-    res.json({
-      mensagem: resposta,
-      medico: 'Dr. Alexandre Santos',
-      fase: sessao.fase,
-      timestamp: new Date()
-    });
-
-  } catch (error) {
-    console.error('Erro ao processar mensagem:', error);
-    res.status(500).json({ 
-      error: 'Dr. Alexandre está temporariamente indisponível. Tente novamente.' 
-    });
-  }
-});
-
-// Obter informações sobre medicamentos
-app.get('/api/medicamentos/:categoria?', (req, res) => {
-  try {
-    const { categoria } = req.params;
-    
-    if (categoria && MEDICAMENTOS_PSIQUIATRICOS[categoria]) {
-      res.json({
-        categoria,
-        medicamentos: MEDICAMENTOS_PSIQUIATRICOS[categoria]
-      });
-    } else {
-      res.json({
-        categorias: Object.keys(MEDICAMENTOS_PSIQUIATRICOS),
-        medicamentos: MEDICAMENTOS_PSIQUIATRICOS
+      return res.status(400).json({
+        erro: "ID da sessão e mensagem são obrigatórios",
       });
     }
-  } catch (error) {
-    res.status(500).json({ error: 'Erro ao obter informações sobre medicamentos' });
-  }
-});
 
-// Finalizar consulta
-app.post('/api/consulta/finalizar', async (req, res) => {
-  try {
-    const { sessaoId } = req.body;
-    const sessao = sessoes.get(sessaoId);
-    
+    const sessao = gerenciadorSessao.obterSessao(sessaoId);
     if (!sessao) {
-      return res.status(404).json({ error: 'Sessão não encontrada' });
+      return res.status(404).json({
+        erro: "Sessão não encontrada ou expirada",
+      });
     }
 
-    const contextoFinal = `
-FINALIZANDO CONSULTA:
-- Resumir principais pontos discutidos
-- Reforçar plano terapêutico se estabelecido
-- Agendar retorno (15-30 dias se medicação, 1-2 semanas se caso agudo)
-- Dar orientações de emergência (quando procurar ajuda imediata)
-- Despedida profissional e acolhedora
-- Lembrar que pode entrar em contato se necessário
+    gerenciadorSessao.adicionarMensagem(sessaoId, "colega", mensagem);
+
+    const contextoDiscussao = `
+Discussão entre psiquiatras
+Colega: Dr(a). ${sessao.colega.nome}
+${
+  sessao.colega.especialidade
+    ? `Especialidade: ${sessao.colega.especialidade}`
+    : ""
+}
+${sessao.colega.topico ? `Tópico inicial: ${sessao.colega.topico}` : ""}
 `;
 
-    const mensagemFinal = await chamarClaude(
-      "Doutor, acredito que por hoje é isso. Muito obrigado pela consulta.", 
-      sessao.historico, 
-      contextoFinal
+    const resposta = await gerenciadorClaude.chamarClaude(
+      mensagem,
+      sessao.historico,
+      contextoDiscussao
     );
 
-    sessao.historico.push({
-      tipo: 'medico',
-      conteudo: mensagemFinal,
-      timestamp: new Date()
-    });
+    gerenciadorSessao.adicionarMensagem(sessaoId, "dr_alexandre", resposta);
 
-    // Remover sessão após 2 horas
-    setTimeout(() => {
-      sessoes.delete(sessaoId);
-    }, 7200000);
+    console.log(`💬 Discussão na sessão ${sessaoId}`);
 
     res.json({
-      mensagem: mensagemFinal,
-      finalizada: true,
-      proximoRetorno: "15-30 dias",
-      orientacoes: "Em caso de emergência, procure o pronto-socorro mais próximo ou ligue 192."
+      resposta,
+      sessaoId: sessao.id,
+    });
+  } catch (error) {
+    console.error("Erro na conversa:", error);
+    res.status(500).json({
+      erro: error.message || "Erro ao processar mensagem",
+    });
+  }
+});
+
+// Demais rotas permanecem iguais...
+// [Resto do código continua igual]
+
+// Iniciar servidor
+app.listen(PORT, "0.0.0.0", () => {
+  console.log(`🚀 Servidor rodando na porta ${PORT}`);
+  console.log(`🔗 Acesse: http://localhost:${PORT}`);
+  console.log(`👨‍⚕️ Dr. Alexandre Santos - Discussões Fenomenológicas`);
+  console.log(
+    `🤖 Claude API: ${CLAUDE_API_KEY ? "✅ Configurada" : "❌ Não configurada"}`
+  );
+});
+// Rota para obter informações da sessão
+app.get("/api/sessao/:id", (req, res) => {
+  try {
+    const sessao = gerenciadorSessao.obterSessao(req.params.id);
+    if (!sessao) {
+      return res.status(404).json({
+        erro: "Sessão não encontrada",
+      });
+    }
+
+    res.json({
+      id: sessao.id,
+      colega: sessao.colega,
+      tipo: sessao.tipo,
+      iniciada: sessao.iniciada,
+      ultimaAtividade: sessao.ultimaAtividade,
+      totalMensagens: sessao.historico.length,
+      topicos_discutidos: sessao.topicos_discutidos,
+    });
+  } catch (error) {
+    console.error("Erro ao obter sessão:", error);
+    res.status(500).json({
+      erro: "Erro interno do servidor",
+    });
+  }
+});
+
+// Rota para obter histórico da sessão
+app.get("/api/sessao/:id/historico", (req, res) => {
+  try {
+    const sessao = gerenciadorSessao.obterSessao(req.params.id);
+    if (!sessao) {
+      return res.status(404).json({
+        erro: "Sessão não encontrada",
+      });
+    }
+
+    res.json({
+      historico: sessao.historico,
+      colega: sessao.colega,
+    });
+  } catch (error) {
+    console.error("Erro ao obter histórico:", error);
+    res.status(500).json({
+      erro: "Erro interno do servidor",
+    });
+  }
+});
+
+// Rota para exportar discussão
+app.get("/api/sessao/:id/exportar", (req, res) => {
+  try {
+    const sessao = gerenciadorSessao.obterSessao(req.params.id);
+    if (!sessao) {
+      return res.status(404).json({
+        erro: "Sessão não encontrada",
+      });
+    }
+
+    // Formatar discussão para exportação
+    let textoExportado = `DISCUSSÃO CLÍNICA - ${new Date(
+      sessao.iniciada
+    ).toLocaleString("pt-BR")}\n`;
+    textoExportado += `Participantes: Dr. Alberts, CAIO P & Dr(a). ${sessao.colega.nome}\n`;
+    textoExportado += `${
+      sessao.colega.especialidade
+        ? `Especialidade: ${sessao.colega.especialidade}\n`
+        : ""
+    }`;
+    textoExportado += `\n--- TRANSCRIÇÃO ---\n\n`;
+
+    sessao.historico.forEach((msg) => {
+      const hora = new Date(msg.timestamp).toLocaleTimeString("pt-BR");
+      if (msg.tipo === "colega") {
+        textoExportado += `[${hora}] Dr(a). ${sessao.colega.nome}: ${msg.conteudo}\n\n`;
+      } else {
+        textoExportado += `[${hora}] Dr. Alexandre: ${msg.conteudo}\n\n`;
+      }
     });
 
+    res.setHeader("Content-Type", "text/plain; charset=utf-8");
+    res.setHeader(
+      "Content-Disposition",
+      `attachment; filename="discussao_${sessao.id}.txt"`
+    );
+    res.send(textoExportado);
   } catch (error) {
-    console.error('Erro ao finalizar consulta:', error);
-    res.status(500).json({ error: 'Erro ao finalizar consulta' });
+    console.error("Erro ao exportar discussão:", error);
+    res.status(500).json({
+      erro: "Erro ao exportar discussão",
+    });
   }
 });
 
-// Obter relatório da consulta
-app.get('/api/consulta/relatorio/:sessaoId', (req, res) => {
+// Rota para finalizar sessão
+app.post("/api/finalizar-sessao", (req, res) => {
   try {
-    const { sessaoId } = req.params;
-    const sessao = sessoes.get(sessaoId);
-    
-    if (!sessao) {
-      return res.status(404).json({ error: 'Sessão não encontrada' });
+    const { sessaoId, resumo } = req.body;
+
+    if (!sessaoId) {
+      return res.status(400).json({
+        erro: "ID da sessão é obrigatório",
+      });
     }
 
-    const relatorio = {
-      paciente: sessao.paciente,
-      dataConsulta: sessao.iniciada,
-      duracaoConsulta: Math.round((new Date() - sessao.iniciada) / 60000) + ' minutos',
-      faseAtual: sessao.fase,
-      numeroInteracoes: sessao.historico.length,
-      historico: sessao.historico
+    const sessao = gerenciadorSessao.obterSessao(sessaoId);
+    if (!sessao) {
+      return res.status(404).json({
+        erro: "Sessão não encontrada",
+      });
+    }
+
+    gerenciadorSessao.atualizarSessao(sessaoId, {
+      status: "finalizada",
+      resumo: resumo || "Discussão finalizada",
+    });
+
+    console.log(`🏁 Discussão finalizada: ${sessaoId}`);
+
+    res.json({
+      mensagem: "Discussão finalizada com sucesso",
+      resumo: {
+        duracao: new Date() - sessao.iniciada,
+        totalMensagens: sessao.historico.length,
+        participantes: {
+          dr_alexandre: "Dr. Alberts, CAIO PHd",
+          colega: `Dr(a). ${sessao.colega.nome}`,
+        },
+      },
+    });
+  } catch (error) {
+    console.error("Erro ao finalizar sessão:", error);
+    res.status(500).json({
+      erro: "Erro interno do servidor",
+    });
+  }
+});
+
+// Rota para buscar referências (fenomenológicas e científicas)
+app.post("/api/buscar-referencias", async (req, res) => {
+  try {
+    const { topico, tipo } = req.body;
+
+    if (!topico) {
+      return res.status(400).json({
+        erro: "Tópico é obrigatório",
+      });
+    }
+
+    // Simular busca de referências baseada no tipo
+    const referencias = {
+      fenomenologica: [
+        "Binswanger, L. (1942). Grundformen und Erkenntnis menschlichen Daseins",
+        "Blankenburg, W. (1971). Der Verlust der natürlichen Selbstverständlichkeit",
+        "Jaspers, K. (1913). Psicopatologia Geral",
+        "Minkowski, E. (1933). Le Temps vécu",
+        "Tellenbach, H. (1961). Melancholie",
+      ],
+      cientifica: [
+        "Alonso-Fernández, F. (1995). Compêndio de psiquiatria",
+        "American Psychiatric Association. (2013). Manual diagnóstico e estatístico de transtornos mentais: DSM-5",
+        "American Psychiatric Association. (2002–2013). APA Practice Guidelines",
+        "Associação Brasileira de Psiquiatria. (2019). Diretrizes da Associação Brasileira de Psiquiatria",
+        "Canadian Network for Mood and Anxiety Treatments (CANMAT). (2016). Clinical guidelines",
+        "Cher, E. (2019). Manual de psicopatologia (6ª ed.)",
+        "Cochrane Collaboration. (1995–presente). Cochrane Reviews - Psychiatry",
+        "Dalgalarrondo, P. (2008). Psicopatologia e semiologia dos transtornos mentais",
+        "International Advisory Group for the Revision of ICD-10 Mental and Behavioural Disorders. (2018). ICD-11",
+        "Kaplan, H. I., & Sadock, B. J. (2007). Compêndio de psiquiatria: ciência do comportamento e psiquiatria clínica (9ª ed.)",
+        "Messas, G., & Tamelini, M. (2010). Fundamentos de clínica fenomenológica",
+        "Quevedo, J., & Izquierdo, I. (2001). Neurobiologia dos transtornos psiquiátricos",
+        "Quevedo, J. (2007). Emergências psiquiátricas",
+        "Sallet, P. C. (2017). Manual do residente de psiquiatria (IPq-HCFMUSP)",
+        "Stahl, S. M. (2013). Psicofarmacologia: bases neurocientíficas e aplicações práticas (5ª ed.)",
+        "World Federation of Societies of Biological Psychiatry. (2007–2013). Guidelines for biological treatment of psychiatric disorders",
+        "Castellana, G. B. (2015). Psicopatologia clínica e entrevista psiquiátrica (IPq-HCFMUSP)",
+        "Louzã, M. R., & Cordás, T. A. (2004). Transtornos da personalidade",
+        "Diversos autores. (2015–presente). Estudos clínicos prospectivos randomizados, placebo-controlados, publicados em revistas científicas de alto impacto",
+        "Avanços em psicopatologia: avaliação diagnóstica baseada na CID-11 (2019)",
+      ],
+      integrativa: [
+        "Fuchs, T. (2010). Phenomenology and psychopathology",
+        "Kendler, K. (2016). The phenomenology of major depression",
+        "Maj, M. (2012). The critique of DSM-5",
+        "Parnas, J., & Sass, L. (2011). The spectrum of schizophrenia",
+        "Stanghellini, G., & Broome, M. (2014). Psychopathology as the basic science of psychiatry",
+      ],
     };
 
-    res.json(relatorio);
+    const tipoReferencia = tipo || "integrativa";
 
+    res.json({
+      topico,
+      tipo: tipoReferencia,
+      referencias: referencias[tipoReferencia] || referencias.integrativa,
+      sugestao:
+        "Posso elaborar mais sobre qualquer uma dessas referências ou buscar outras mais específicas.",
+    });
   } catch (error) {
-    console.error('Erro ao gerar relatório:', error);
-    res.status(500).json({ error: 'Erro ao gerar relatório' });
+    console.error("Erro ao buscar referências:", error);
+    res.status(500).json({
+      erro: "Erro ao buscar referências",
+    });
   }
 });
 
-// Health check
-app.get('/health', (req, res) => {
-  res.json({ 
-    status: 'OK', 
+// Rota de status da API
+app.get("/api/status", (req, res) => {
+  res.json({
+    status: "online",
     timestamp: new Date().toISOString(),
-    consultasAtivas: sessoes.size,
-    claudeAPI: 'Configurada',
-    medicamentos: Object.keys(MEDICAMENTOS_PSIQUIATRICOS).length + ' categorias'
+    versao: "3.0.0-fenomenologica",
+    tipo: "Sistema de Discussão entre Psiquiatras",
+    abordagem: "Fenomenológica-Descritiva",
+    sessoes_ativas: gerenciadorSessao.sessoes.size,
+    claude_configurado: !!CLAUDE_API_KEY,
   });
 });
 
-// Middleware de erro
-app.use((err, req, res, next) => {
-  console.error('Erro não tratado:', err);
-  res.status(500).json({ 
-    error: 'Erro interno. Entre em contato com a recepção.' 
+// Rota para servir o frontend
+app.get("/", (req, res) => {
+  res.sendFile(path.join(__dirname, "public", "index.html"));
+});
+
+// Middleware de tratamento de erros
+app.use((error, req, res, next) => {
+  console.error("Erro não tratado:", error);
+  res.status(500).json({
+    erro: "Erro interno do servidor",
+    timestamp: new Date().toISOString(),
   });
 });
 
-// Função para encontrar porta disponível
-function startServer(port) {
-  const server = app.listen(port, () => {
-    console.log(`🏥 Dr. Alexandre Santos - Consultório Psiquiátrico`);
-    console.log(`🌐 Servidor rodando na porta ${port}`);
-    console.log(`🔑 Claude API: Configurada`);
-    console.log(`💊 Base farmacológica: ${Object.keys(MEDICAMENTOS_PSIQUIATRICOS).length} categorias`);
-    console.log(`📋 Protocolos médicos: Ativados`);
-    console.log(`✅ Sistema médico real em funcionamento`);
-  }).on('error', (err) => {
-    if (err.code === 'EADDRINUSE') {
-      console.log(`⚠️  Porta ${port} ocupada, tentando ${port + 1}...`);
-      startServer(port + 1);
-    } else {
-      console.error('❌ Erro ao iniciar servidor:', err);
-      process.exit(1);
-    }
-  });
-}
+// Tratamento de encerramento gracioso
+process.on("SIGINT", () => {
+  console.log("\n🛑 Encerrando servidor...");
+  // Salvar sessões ativas se necessário
+  console.log(
+    `📊 ${gerenciadorSessao.sessoes.size} discussões ativas serão encerradas`
+  );
+  process.exit(0);
+});
 
-// Iniciar servidor com detecção automática de porta
-startServer(PORT);
+process.on("SIGTERM", () => {
+  console.log("\n🛑 Encerrando servidor...");
+  process.exit(0);
+});
 
+// Tratamento de erros não capturados
+process.on("uncaughtException", (error) => {
+  console.error("Erro não capturado:", error);
+  process.exit(1);
+});
+
+process.on("unhandledRejection", (reason, promise) => {
+  console.error("Promise rejeitada não tratada:", reason);
+});
+
+module.exports = app;
